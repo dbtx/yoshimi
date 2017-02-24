@@ -63,11 +63,12 @@ class SUBnoteParameters : public Presets
         unsigned short int PDetune;
         unsigned short int PCoarseDetune;
         unsigned char PDetuneType;
-        unsigned char PFreqEnvelopeEnabled;
         EnvelopeParams *FreqEnvelope;
+        unsigned char PFreqEnvelopeEnabled;
         LFOParams *FreqLfo;
-        unsigned char PBandWidthEnvelopeEnabled;
+        unsigned char PFreqLfoEnabled;
         EnvelopeParams *BandWidthEnvelope;
+        unsigned char PBandWidthEnvelopeEnabled;
         LFOParams *BandWidthLfo;
         unsigned char PBandWidthLfoEnabled;
 

@@ -31,6 +31,7 @@
 #include "Params/SUBnoteParameters.h"
 #include "Params/Controller.h"
 #include "Synth/Envelope.h"
+#include "Synth/LFO.h"
 #include "DSP/Filter.h"
 #include "Misc/SynthEngine.h"
 #include "Synth/SUBnote.h"
@@ -600,6 +601,10 @@ void SUBnote::initparameters(float freq)
         BandWidthEnvelope = new Envelope(pars->BandWidthEnvelope, freq, synth);
     else
         BandWidthEnvelope = NULL;
+    if (pars->PBandWidthLfoEnabled != 0)
+        BandWidthLfo = new LFO(pars->BandWidthLfo, freq, synth);
+    else
+        BandWidthLfo = NULL;
     if (pars->PGlobalFilterEnabled != 0)
     {
         globalfiltercenterq = pars->GlobalFilter->getq();
@@ -608,6 +613,7 @@ void SUBnote::initparameters(float freq)
             GlobalFilterR = new Filter(pars->GlobalFilter, synth);
         GlobalFilterEnvelope = new Envelope(pars->GlobalFilterEnvelope, freq, synth);
         GlobalFilterFreqTracking = pars->GlobalFilter->getfreqtracking(basefreq);
+        FilterLfo = new LFO(pars->GlobalFilterLfo, basefreq, synth);
     }
     computecurrentparameters();
 }
@@ -645,6 +651,9 @@ void SUBnote::computecurrentparameters(void)
         float envfreq = 1.0f;
         float envbw = 1.0f;
         float gain = 1.0f;
+        float lfoamp = 1.0f;
+        float lfofreq = 1.0f;
+        float lfobw = 1.0f;
 
         if (FreqEnvelope != NULL)
         {
@@ -667,6 +676,11 @@ void SUBnote::computecurrentparameters(void)
         {
             envbw = BandWidthEnvelope->envout();
             envbw = powf(2.0f, envbw);
+        }
+        if (BandWidthLfo != NULL)
+        {
+            lfobw = BandWidthLfo->amplfoout();
+            envbw += powf(2.0f, lfobw);
         }
         envbw *= ctl->bandwidth.relbw; // bandwidth controller
 
@@ -707,7 +721,7 @@ void SUBnote::computecurrentparameters(void)
     // Filter
     if (GlobalFilterL != NULL)
     {
-        float globalfilterpitch = GlobalFilterCenterPitch + GlobalFilterEnvelope->envout();
+        float globalfilterpitch = GlobalFilterCenterPitch + GlobalFilterEnvelope->envout() + FilterLfo->lfoout();
         float filterfreq = globalfilterpitch + ctl->filtercutoff.relfreq + GlobalFilterFreqTracking;
         filterfreq = GlobalFilterL->getrealfreq(filterfreq);
 

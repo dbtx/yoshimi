@@ -453,7 +453,8 @@ Fl_Group freqsettingsui {
   Fl_Group freqenvelopegroup {
     label {SUBSynth - Frequency Envelope}
     xywh {10 325 205 70} box FLAT_BOX color 51 labelsize 12 align 144
-    code0 {o->init(pars->FreqEnvelope, npart, kititem, 2, 1);}
+    code0 {o->init(pars->FreqEnvelope, npart, kititem, 2, 1);
+            if (pars->PFreqEnvelopeEnabled==0) o->deactivate();}
     class EnvelopeUI
   } {}
   Fl_Check_Button freqee {
@@ -467,8 +468,7 @@ else
 o->show();
 freqsettingsui->redraw();
 send_data (40, o->value(), 0xc0);}
-    xywh {445 68 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
-    code0 {o->value(pars->PFreqEnvelopeEnabled);}
+    xywh {10 328 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
   }
   Fl_Counter octave {
     label Octave
@@ -501,9 +501,24 @@ send_data(37, o->value(), 0xc0);}
   Fl_Group freqlfo {
     label {Frequency LFO     }
     xywh {215 325 230 70} box FLAT_BOX color 47 labelsize 12 align 144
-    code0 {o->init(pars->FreqLfo, npart, kititem, 2, 1);}
+    code0 {o->init(pars->FreqLfo, npart, kititem, 2, 1);
+        if (pars->PFreqLfoEnabled==0) o->deactivate();}
     class LFOUI
   } {}
+  Fl_Check_Button freqle {
+    label Enabled
+    callback {//
+pars->PFreqLfoEnabled = o->value();
+if (o->value() == 0)
+  freqlfo->deactivate();
+else
+  freqlfo->activate();
+o->show();
+freqsettingsui->redraw();
+send_data (40, o->value(), 0xc0);}
+    xywh {215 328 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
+    code0 {o->value(pars->PFreqEnvelopeEnabled);}
+  }
   Fl_Slider detune {
     callback {//
 if (Fl::event_button() == 3)
@@ -774,6 +789,13 @@ else
             freqenvelopegroup->activate();
         freqee->show();
         freqsettingsui->redraw();
+
+        freqle->value(pars->PFreqEnvelopeEnabled);
+        if (pars->PFreqLfoEnabled == 0)
+            freqlfo->deactivate();
+        else
+            freqlfo->activate();
+        freqle->show();
 
         detune->value(pars->PDetune - 8192);
         hz440->value(pars->Pfixedfreq);

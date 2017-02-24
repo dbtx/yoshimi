@@ -33,6 +33,7 @@
 class SUBnoteParameters;
 class Controller;
 class Envelope;
+class LFO;
 class Filter;
 
 class SynthEngine;
@@ -80,6 +81,11 @@ class SUBnote : public Carcass, private SynthHelper
         Filter *GlobalFilterL,*GlobalFilterR;
 
         Envelope *GlobalFilterEnvelope;
+
+        LFO *AmpLfo;
+        LFO *FilterLfo;
+        LFO *FreqLfo;
+        LFO *BandWidthLfo;
 
         // internal values
         bool NoteEnabled;
