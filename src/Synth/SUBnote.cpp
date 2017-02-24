@@ -593,10 +593,17 @@ void SUBnote::filterVarRun(SUBnote::bpfilter &filter, float *smps)
 void SUBnote::initparameters(float freq)
 {
     AmpEnvelope = new Envelope(pars->AmpEnvelope, freq, synth);
+    AmpLfo = new LFO(pars->AmpLfo, freq, synth);
+
     if (pars->PFreqEnvelopeEnabled != 0)
         FreqEnvelope = new Envelope(pars->FreqEnvelope, freq, synth);
     else
         FreqEnvelope = NULL;
+    if (pars->PFreqLfoEnabled != 0)
+        FreqLfo = new LFO(pars->FreqLfo, freq, synth);
+    else
+        FreqLfo = NULL;
+
     if (pars->PBandWidthEnvelopeEnabled != 0)
         BandWidthEnvelope = new Envelope(pars->BandWidthEnvelope, freq, synth);
     else
@@ -642,30 +649,35 @@ float SUBnote::computerolloff(float freq)
 // Compute Parameters of SUBnote for each tick
 void SUBnote::computecurrentparameters(void)
 {
+#if 0
     if (FreqEnvelope != NULL
         || BandWidthEnvelope != NULL
         || oldpitchwheel != ctl->pitchwheel.data
         || oldbandwidth != ctl->bandwidth.data
         || portamento != 0)
+#endif
     {
-        float envfreq = 1.0f;
-        float envbw = 1.0f;
+        float newfreq = 1.0f;
+        float newbw = 1.0f;
         float gain = 1.0f;
-        float lfoamp = 1.0f;
-        float lfofreq = 1.0f;
-        float lfobw = 1.0f;
 
         if (FreqEnvelope != NULL)
         {
-            envfreq = FreqEnvelope->envout() / 1200;
-            envfreq = powf(2.0f, envfreq);
+            float envfreq = FreqEnvelope->envout() / 1200;
+            newfreq = powf(2.0f, envfreq);
         }
 
-        envfreq *= powf(ctl->pitchwheel.relfreq, BendAdjust); // pitch wheel
+        if (FreqLfo != NULL)
+        {
+            float lfofreq = FreqLfo->lfoout() / 1200;
+            newfreq += powf(2.0f, lfofreq);
+        }
+
+        newfreq *= powf(ctl->pitchwheel.relfreq, BendAdjust); // pitch wheel
 
         if (portamento != 0)
         {   // portamento is used
-            envfreq *= ctl->portamento.freqrap;
+            newfreq *= ctl->portamento.freqrap;
             if (ctl->portamento.used == 0)
             {   // the portamento has finished
                 portamento = 0; // this note is no longer "portamented"
@@ -674,17 +686,17 @@ void SUBnote::computecurrentparameters(void)
 
         if (BandWidthEnvelope != NULL)
         {
-            envbw = BandWidthEnvelope->envout();
-            envbw = powf(2.0f, envbw);
+            float envbw = BandWidthEnvelope->envout();
+            newbw = powf(2.0f, envbw);
         }
         if (BandWidthLfo != NULL)
         {
-            lfobw = BandWidthLfo->amplfoout();
-            envbw += powf(2.0f, lfobw);
+            float lfobw = BandWidthLfo->lfoout();
+            newbw *= powf(2.0f, lfobw);
         }
-        envbw *= ctl->bandwidth.relbw; // bandwidth controller
+        newbw *= ctl->bandwidth.relbw; // bandwidth controller
 
-        float tmpgain = 1.0f / sqrtf(envbw * envfreq);
+        float tmpgain = 1.0f / sqrtf(newbw * newfreq);
 
         for (int n = 0; n < numharmonics; ++n)
         {
@@ -695,8 +707,8 @@ void SUBnote::computecurrentparameters(void)
                 else
                     gain = 1.0f;
                 computefiltercoefs( lfilter[nph + n * numstages],
-                                    lfilter[nph + n *numstages].freq * envfreq,
-                                    lfilter[nph + n * numstages].bw * envbw, gain);
+                                    lfilter[nph + n *numstages].freq * newfreq,
+                                    lfilter[nph + n * numstages].bw * newbw, gain);
             }
         }
         if (stereo)
@@ -709,14 +721,14 @@ void SUBnote::computecurrentparameters(void)
                     else
                         gain = 1.0f;
                     computefiltercoefs( rfilter[nph + n * numstages],
-                                        rfilter[nph + n * numstages].freq * envfreq,
-                                        rfilter[nph + n * numstages].bw * envbw, gain);
+                                        rfilter[nph + n * numstages].freq * newfreq,
+                                        rfilter[nph + n * numstages].bw * newbw, gain);
                 }
             }
         oldbandwidth = ctl->bandwidth.data;
         oldpitchwheel = ctl->pitchwheel.data;
     }
-    newamplitude = volume * AmpEnvelope->envout_dB() * 2.0f;
+    newamplitude = volume * AmpEnvelope->envout_dB() * AmpLfo->amplfoout() * 2.0f;
 
     // Filter
     if (GlobalFilterL != NULL)

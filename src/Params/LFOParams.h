@@ -63,7 +63,7 @@ class LFOParams : public Presets
         unsigned char Pcontinous;
         unsigned char Pstretch;
 
-        int fel;         // kind of LFO - 0 frequency, 1 amplitude, 2 filter
+        int fel;         // kind of LFO - 0 frequency, 1 amplitude, 2 filter, 3 bandwidth
        // static int time; // used by Pcontinous - moved to SynthEngine to make it per-instance
         bool updated;
 
