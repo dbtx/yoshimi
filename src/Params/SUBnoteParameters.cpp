@@ -23,20 +23,26 @@
 */
 
 #include "Params/SUBnoteParameters.h"
+#include "Params/LFOParams.h"
 
 SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : Presets(_synth)
 {
     setpresettype("SUBnoteParameters");
     AmpEnvelope = new EnvelopeParams(64, 1, synth);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
+    AmpLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 1, synth);
     FreqEnvelope = new EnvelopeParams(64, 0, synth);
     FreqEnvelope->ASRinit(30, 50, 64, 60);
+    FreqLfo = new LFOParams(70, 0, 64, 0, 0, 0, 0, 0, synth);
     BandWidthEnvelope = new EnvelopeParams(64, 0, synth);
     BandWidthEnvelope->ASRinit_bw(100, 70, 64, 60);
+    BandWidthLfo = new LFOParams(70, 0, 64, 0, 0, 0, 0, 0, synth); //FIXME
 
     GlobalFilter = new FilterParams(2, 80, 40, 0, synth);
     GlobalFilterEnvelope = new EnvelopeParams(0, 1, synth);
     GlobalFilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
+    GlobalFilterLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 2, synth);
+
     defaults();
 }
 

@@ -31,6 +31,7 @@
 #include "Params/Presets.h"
 
 class SynthEngine;
+class LFOParams;
 
 class SUBnoteParameters : public Presets
 {
@@ -54,6 +55,9 @@ class SUBnoteParameters : public Presets
         float pangainR;         // ^^
         unsigned char PAmpVelocityScaleFunction;
         EnvelopeParams *AmpEnvelope;
+        LFOParams *AmpLfo;
+
+        unsigned char PPunchStrength, PPunchTime, PPunchStretch, PPunchVelocitySensing;
 
         // Frequency Parameters
         unsigned short int PDetune;
@@ -61,8 +65,11 @@ class SUBnoteParameters : public Presets
         unsigned char PDetuneType;
         unsigned char PFreqEnvelopeEnabled;
         EnvelopeParams *FreqEnvelope;
+        LFOParams *FreqLfo;
         unsigned char PBandWidthEnvelopeEnabled;
         EnvelopeParams *BandWidthEnvelope;
+        LFOParams *BandWidthLfo;
+        unsigned char PBandWidthLfoEnabled;
 
         unsigned char PBendAdjust; // Pitch Bend
         unsigned char POffsetHz;
@@ -73,6 +80,7 @@ class SUBnoteParameters : public Presets
         unsigned char PGlobalFilterVelocityScale;
         unsigned char PGlobalFilterVelocityScaleFunction;
         EnvelopeParams *GlobalFilterEnvelope;
+        LFOParams *GlobalFilterLfo;
 
         // Other Parameters
         unsigned char Pfixedfreq;   // If the base frequency is fixed to 440 Hz
