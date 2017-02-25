@@ -84,6 +84,10 @@ inline void LFO::Recompute(void)
             lfointensity = lfopars->Pintensity / 127.0f * 4.0f;
             break; // in octave
 
+        case 3:
+            lfointensity = lfopars->Pintensity / 127.0f * 2.5f;
+            break; // bandwidth
+
         default:
             lfointensity = powf(2.0f, lfopars->Pintensity / 127.0f * 11.0f) - 1.0f; // in centi
             break;

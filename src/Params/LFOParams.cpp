@@ -53,6 +53,9 @@ LFOParams::LFOParams(float Pfreq_, unsigned char Pintensity_,
         case 2:
             setpresettype("Plfofilter");
             break;
+        case 3:
+            setpresettype("Plfobandwidth");
+            break;
     };
     defaults();
     updated = true;

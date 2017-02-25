@@ -36,7 +36,7 @@ SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : Presets(_synth)
     FreqLfo = new LFOParams(70, 0, 64, 0, 0, 0, 0, 0, synth);
     BandWidthEnvelope = new EnvelopeParams(64, 0, synth);
     BandWidthEnvelope->ASRinit_bw(100, 70, 64, 60);
-    BandWidthLfo = new LFOParams(70, 0, 64, 0, 0, 0, 0, 0, synth); //FIXME
+    BandWidthLfo = new LFOParams(70, 0, 64, 0, 0, 0, 0, 3, synth); //FIXME
 
     GlobalFilter = new FilterParams(2, 80, 40, 0, synth);
     GlobalFilterEnvelope = new EnvelopeParams(0, 1, synth);

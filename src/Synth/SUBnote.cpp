@@ -670,7 +670,7 @@ void SUBnote::computecurrentparameters(void)
         if (FreqLfo != NULL)
         {
             float lfofreq = FreqLfo->lfoout() / 1200;
-            newfreq += powf(2.0f, lfofreq);
+            newfreq += lfofreq;// powf(2.0f, lfofreq);
         }
 
         newfreq *= powf(ctl->pitchwheel.relfreq, BendAdjust); // pitch wheel
@@ -692,7 +692,8 @@ void SUBnote::computecurrentparameters(void)
         if (BandWidthLfo != NULL)
         {
             float lfobw = BandWidthLfo->lfoout();
-            newbw *= powf(2.0f, lfobw);
+            //newbw += lfobw;
+            newbw += powf(2.0f, lfobw);
         }
         newbw *= ctl->bandwidth.relbw; // bandwidth controller
 
