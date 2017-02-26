@@ -686,16 +686,13 @@ void SUBnote::computecurrentparameters(void)
 
         if (BandWidthEnvelope != NULL)
         {
-            float envbw = BandWidthEnvelope->envout();
-            newbw = powf(2.0f, envbw);
+            newbw += BandWidthEnvelope->envout();
         }
         if (BandWidthLfo != NULL)
         {
-            float lfobw = BandWidthLfo->lfoout();
-            //newbw += lfobw;
-            newbw += powf(2.0f, lfobw);
+            newbw += BandWidthLfo->lfoout();
         }
-        newbw *= ctl->bandwidth.relbw; // bandwidth controller
+        newbw = powf(2.0, newbw) * ctl->bandwidth.relbw; // bandwidth controller
 
         float tmpgain = 1.0f / sqrtf(newbw * newfreq);
 
