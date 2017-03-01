@@ -3778,38 +3778,38 @@ void InterChange::commandSub(CommandBlock *getData)
         case 48:
             if (write)
             {
-                pars->POvertoneSpread.par1 = value;
+                pars->POvertoneSpread[1] = value;
                 pars->updateFrequencyMultipliers();
             }
             else
-                value = pars->POvertoneSpread.par1;
+                value = pars->POvertoneSpread[1];
             break;
         case 49:
             if (write)
             {
-                pars->POvertoneSpread.par2 = value;
+                pars->POvertoneSpread[2] = value;
                 pars->updateFrequencyMultipliers();
             }
             else
-                value = pars->POvertoneSpread.par2;
+                value = pars->POvertoneSpread[2];
             break;
         case 50:
             if (write)
             {
-                pars->POvertoneSpread.par3 = value;
+                pars->POvertoneSpread[3] = value;
                 pars->updateFrequencyMultipliers();
             }
             else
-                value = pars->POvertoneSpread.par3;
+                value = pars->POvertoneSpread[3];
             break;
         case 51:
             if (write)
             {
-                pars->POvertoneSpread.type =  (int)value;
+                pars->POvertoneSpread[0] =  (int)value;
                 pars->updateFrequencyMultipliers();
             }
             else
-                value = pars->POvertoneSpread.type;
+                value = pars->POvertoneSpread[0];
             break;
 
         case 64:

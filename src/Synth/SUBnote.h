@@ -60,6 +60,9 @@ class SUBnote : public Carcass, private SynthHelper
         void computecurrentparameters(void);
         void initparameters(float freq);
         void KillNote(void);
+        void prepfilterbank(void);
+
+        int pos[MAX_SUB_HARMONICS];
 
         SUBnoteParameters *pars;
 

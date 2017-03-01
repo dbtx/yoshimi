@@ -92,14 +92,11 @@ class SUBnoteParameters : public Presets
                                     // fixed (to 440 Hz)
                                     // if this parameter is 64,
                                     // 1 MIDI halftone -> 1 frequency halftone
+        bool profileupdated;
+        bool overtoneupdated;
 
-        // Overtone spread parameters
-        struct {
-            unsigned char type;
-            unsigned char par1;
-            unsigned char par2;
-            unsigned char par3;
-        } POvertoneSpread;
+        // Overtone spread parameters (type=0,p1=1,p2=2,p3=3)
+        unsigned char  POvertoneSpread[4];
         float POvertoneFreqMult[MAX_SUB_HARMONICS];
 
         unsigned char Pnumstages;   // how many times the filters are applied
@@ -116,6 +113,10 @@ class SUBnoteParameters : public Presets
                                 // to lower/higher frequency; 64-default
 
         unsigned char Pstart;   // how the harmonics start, "0" = 0, "1" = random, "2" = 1
+
+        void setPhmag(int harmonic, int value) {Phmag[harmonic] = value; profileupdated = true; }
+        void setPhrelbw(int harmonic, int value) {Phrelbw[harmonic] = value; profileupdated = true; }
+        void setOvtPar(int p, unsigned char value) { POvertoneSpread[p] = value; overtoneupdated = true; }
 };
 
 #endif

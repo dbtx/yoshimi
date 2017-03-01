@@ -69,10 +69,10 @@ void SUBnoteParameters::defaults(void)
     PFreqEnvelopeEnabled = 0;
     PBandWidthEnvelopeEnabled = 0;
 
-    POvertoneSpread.type = 0;
-    POvertoneSpread.par1 = 0;
-    POvertoneSpread.par2 = 0;
-    POvertoneSpread.par3 = 0;
+    POvertoneSpread[0] = 0;
+    POvertoneSpread[1] = 0;
+    POvertoneSpread[2] = 0;
+    POvertoneSpread[3] = 0;
     updateFrequencyMultipliers();
 
     for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
@@ -91,6 +91,8 @@ void SUBnoteParameters::defaults(void)
     BandWidthEnvelope->defaults();
     GlobalFilter->defaults();
     GlobalFilterEnvelope->defaults();
+    profileupdated = true;
+    overtoneupdated = true;
 }
 
 
@@ -155,10 +157,10 @@ void SUBnoteParameters::add2XML(XMLwrapper *xml)
 
         xml->addpar("detune",PDetune);
         xml->addpar("coarse_detune",PCoarseDetune);
-        xml->addpar("overtone_spread_type", POvertoneSpread.type);
-        xml->addpar("overtone_spread_par1", POvertoneSpread.par1);
-        xml->addpar("overtone_spread_par2", POvertoneSpread.par2);
-        xml->addpar("overtone_spread_par3", POvertoneSpread.par3);
+        xml->addpar("overtone_spread_type", POvertoneSpread[0]);
+        xml->addpar("overtone_spread_par1", POvertoneSpread[1]);
+        xml->addpar("overtone_spread_par2", POvertoneSpread[2]);
+        xml->addpar("overtone_spread_par3", POvertoneSpread[3]);
         xml->addpar("detune_type",PDetuneType);
 
         xml->addpar("bandwidth",Pbandwidth);
@@ -202,11 +204,11 @@ void SUBnoteParameters::add2XML(XMLwrapper *xml)
 
 void SUBnoteParameters::updateFrequencyMultipliers(void)
 {
-    float par1 = POvertoneSpread.par1 / 255.0f;
+    float par1 = POvertoneSpread[1] / 255.0f;
     float par1pow = powf(10.0f,
-            -(1.0f - POvertoneSpread.par1 / 255.0f) * 3.0f);
-    float par2 = POvertoneSpread.par2 / 255.0f;
-    float par3 = 1.0f - POvertoneSpread.par3 / 255.0f;
+            -(1.0f - POvertoneSpread[1] / 255.0f) * 3.0f);
+    float par2 = POvertoneSpread[2] / 255.0f;
+    float par3 = 1.0f - POvertoneSpread[3] / 255.0f;
     float result;
     float tmp = 0.0f;
     int   thresh = 0;
@@ -214,7 +216,7 @@ void SUBnoteParameters::updateFrequencyMultipliers(void)
     for(int n = 0; n < MAX_SUB_HARMONICS; ++n)
     {
         float n1     = n + 1.0f;
-        switch(POvertoneSpread.type)
+        switch(POvertoneSpread[0])
         {
             case 1:
                 thresh = (int)(100.0f * par2 * par2) + 1;
@@ -309,14 +311,14 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
 
         PDetune=xml->getpar("detune",PDetune,0,16383);
         PCoarseDetune=xml->getpar("coarse_detune",PCoarseDetune,0,16383);
-        POvertoneSpread.type =
-            xml->getpar127("overtone_spread_type", POvertoneSpread.type);
-        POvertoneSpread.par1 =
-            xml->getpar("overtone_spread_par1", POvertoneSpread.par1, 0, 255);
-        POvertoneSpread.par2 =
-            xml->getpar("overtone_spread_par2", POvertoneSpread.par2, 0, 255);
-        POvertoneSpread.par3 =
-            xml->getpar("overtone_spread_par3", POvertoneSpread.par3, 0, 255);
+        POvertoneSpread[0] =
+            xml->getpar127("overtone_spread_type", POvertoneSpread[0]);
+        POvertoneSpread[1] =
+            xml->getpar("overtone_spread_par1", POvertoneSpread[1], 0, 255);
+        POvertoneSpread[2] =
+            xml->getpar("overtone_spread_par2", POvertoneSpread[2], 0, 255);
+        POvertoneSpread[3] =
+            xml->getpar("overtone_spread_par3", POvertoneSpread[3], 0, 255);
         updateFrequencyMultipliers();
         PDetuneType=xml->getpar127("detune_type",PDetuneType);
 
@@ -398,5 +400,12 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
 
 void SUBnoteParameters::postrender(void)
 {
+    // loop over our gathered dirty flags and unset them for the next period
+      AmpLfo->updated
+    = BandWidthLfo->updated
+    = GlobalFilterLfo->updated
+    = FreqLfo->updated
+    = false;
+
     return;
 }

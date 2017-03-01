@@ -64,6 +64,8 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {\#include "MasterUI.h"} {private global
 }
 
+decl {SUBnoteOvertonePosition *opui;} {private global}
+
 class SUBnoteharmonic {: {public Fl_Group}
 } {
   Function {make_window()} {private
@@ -82,7 +84,8 @@ else
         x = 127;
     o->value(127-x);
 }
-pars->Phmag[n]=x;
+pars->setPhmag(n, x);
+opui->redraw();
 
 send_data(6, n, x, 0xc8);
 
@@ -101,7 +104,8 @@ if (Fl::event_button() != 3)
     x=127-(int)o->value();
 else
     o->value(x);
-pars->Phrelbw[n]=x;
+pars->setPhrelbw(n, x);
+opui->redraw();
 
 send_data(7, n, x, 0xc8);
 
@@ -169,6 +173,112 @@ hide();
   }
 }
 
+class SUBnoteOvertonePosition {: {public Fl_Box, private MiscFuncs}
+} {
+  Function {SUBnoteOvertonePosition(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
+    code {pars=NULL;} {}
+  }
+  Function {init(SUBnoteParameters *pars)} {} {
+    code {synth = pars->getSynthEngine();
+this->pars=pars;} {}
+  }
+  Function {draw()} {} {
+    code {//
+        if (!visible()) return;
+        const int maxdb = 60;
+        int ox = x(), oy = y(), lx = w(), ly = h();
+        const int maxharmonic = 64;
+
+        for (int i = 1; i < maxharmonic; i++)
+        {
+            fl_color(200, 200, 200);
+            fl_line_style(FL_DOT);
+            if (i % 5 == 0)
+                fl_line_style(0);
+            if (i % 10 == 0)
+                fl_color(160, 160, 160);
+            int kx = (int)(lx / (float)maxharmonic * i);
+            fl_line(ox + kx, oy, ox + kx, oy + ly);
+        }
+
+        int n = MAX_SUB_HARMONICS;
+        float spc[n];
+        float spcb[n];
+        for (int i = 0; i < n; i++)
+        {
+            spc[i] = pars->Phmag[i];
+            spcb[i]= pars->Phrelbw[i];
+        }
+        //synth->actionLock(lock);
+        //pars->oscilgen->getspectrum(n, spc, 0);
+        //synth->actionLock(unlock);
+
+        //normalize
+        float max = 0;
+        for (int i = 0; i < n; i++)
+        {
+            float x = fabsf(spc[i]);
+            if (max < x)
+                max=x;
+        }
+        if (max < 0.000001)
+            max = 1.0;
+        max = max * 1.05;
+
+        float spectrum[lx];
+        for (int i = 0; i < lx; i++)
+            spectrum[i] = 0;
+
+        for (int i = 1; i < n; i++)
+        {
+            float nhr = 64.0f;
+            int kx = (int)(lx / (float)maxharmonic * nhr);
+            if (kx < 0 || kx > lx)
+                continue;
+            spectrum[kx] = spc[i - 1] / max + 1e-9;
+        }
+
+        fl_color(0, 90, 180);
+        fl_line_style(0);
+
+        if (true) // (pars->Pmode == 2)
+        {
+            int old = 0;
+            for (int i = 1; i < lx; i++)
+            {
+                if ((spectrum[i] > 1e-10) || (i == (lx - 1)))
+                {
+                    int delta = i - old;
+                    float val1 = spectrum[old];
+                    float val2 = spectrum[i];
+                    float idelta = 1.0 / delta;
+                    for (int j = 0; j < delta; j++)
+                    {
+                        float x = idelta * j;
+                        spectrum[old + j] = val1 * (1.0 - x) + val2 * x;
+                    }
+                    old = i;
+                }
+            }
+        }
+
+        for (int i = 0; i < lx; i++)
+        {
+            float x = spectrum[i];
+            if (x > dB2rap(-maxdb))
+                x = rap2dB(x) / maxdb + 1;
+            else
+                continue;
+            int yy = (int)(x * ly);
+            fl_line(ox+i,oy+ly-1-yy,ox+i,oy+ly-1);
+        }} {}
+  }
+  decl {SUBnoteParameters *pars;} {public local
+  }
+  decl {SynthEngine *synth;} {private local
+  }
+}
+
 class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {} {
@@ -186,7 +296,7 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
         xywh {0 20 535 495} box ENGRAVED_FRAME labelsize 12
       } {
       Fl_Scroll {} {
-        xywh {5 65 525 330} type HORIZONTAL box THIN_UP_BOX
+        xywh {5 65 525 325} type HORIZONTAL box THIN_UP_BOX
       } {
         Fl_Pack harmonics {
           xywh {15 65 520 325} type HORIZONTAL
@@ -273,15 +383,15 @@ send_data (82, o->value(), 0xc0);}
       }
       Fl_Group {} {
         label OVERTONES
-        xywh {5 400 250 66} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
+        xywh {5 395 250 65} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
       } {
         Fl_Choice spreadtype {
           label {Overtones  Position}
-          callback {pars->POvertoneSpread.type = (int)o->value();
+          callback {pars->setOvtPar(0, (int)o->value());
 pars->updateFrequencyMultipliers();
 send_data (51, o->value(), 0xc0);}
           xywh {20 425 87 20} down_box BORDER_BOX labelsize 10 align 2 textsize 10
-          code0 {o->value(pars->POvertoneSpread.type);}
+          code0 {o->value(pars->POvertoneSpread[0]);}
         } {
           MenuItem {} {
             label Harmonic
@@ -318,35 +428,40 @@ send_data (51, o->value(), 0xc0);}
         }
         Fl_Dial spreadpar1 {
           label Par1
-          callback {pars->POvertoneSpread.par1 = o->value();
+          callback {pars->setOvtPar(1, o->value());
 pars->updateFrequencyMultipliers();
 send_data (48, o->value(), 0xc8);}
           xywh {125 415 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
-          code0 {o->value(pars->POvertoneSpread.par1);}
+          code0 {o->value(pars->POvertoneSpread[1]);}
           code1 {o->init(0);}
           class WidgetPDial
         }
         Fl_Dial spreadpar2 {
           label Par2
-          callback {pars->POvertoneSpread.par2 = o->value();
+          callback {pars->setOvtPar(2, o->value());
 pars->updateFrequencyMultipliers();
 send_data (49, o->value(), 0xc8);}
           xywh {165 415 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
-          code0 {o->value(pars->POvertoneSpread.par2);}
+          code0 {o->value(pars->POvertoneSpread[2]);}
           code1 {o->init(0);}
           class WidgetPDial
         }
         Fl_Dial spreadpar3 {
           label ForceH
-          callback {pars->POvertoneSpread.par3 = o->value();
+          callback {pars->setOvtPar(3, o->value());
 pars->updateFrequencyMultipliers();
 send_data (50, o->value(), 0xc8);}
           xywh {205 415 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
-          code0 {o->value(pars->POvertoneSpread.par3);}
+          code0 {o->value(pars->POvertoneSpread[3]);}
           code1 {o->init(0);}
           code2 {o->setValueType(VC_percent255);}
           class WidgetPDial
         }
+        Fl_Group overtonepos {
+          xywh {5 465 525 45} box FLAT_BOX color 54 selection_color 218 labelcolor 63
+          code0 {opui=new SUBnoteOvertonePosition(o->x(),o->y(),o->w(),o->h(),"");}
+          code1 {opui->init(pars);}
+        } {}
       }
     }
 
