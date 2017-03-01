@@ -1,5 +1,14 @@
 yoshimi 1.5.0 M
 
+2016-2-26 Will
+* Fixed instrument background colours.
+
+2017-2-24 Will
+* Added ARM options to CMakeLists.txt
+* Restored commented out AdNote cubic interpolation
+  for future examination (currently would segfault).
+* Updated copyright notices and dates in various files.
+
 2017-2-23 Will
 *Merged in Rob's live LFO controls.
 
