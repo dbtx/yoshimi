@@ -62,6 +62,7 @@ class SUBnote : public Carcass, private SynthHelper
         void initparameters(float freq);
         void KillNote(void);
         void prepfilterbank(void);
+        void updatefilterbank(void);
 
         int pos[MAX_SUB_HARMONICS];
 
@@ -117,6 +118,7 @@ class SUBnote : public Carcass, private SynthHelper
         };
 
         void initfilter(bpfilter &filter, float freq, float bw, float amp, float mag);
+        inline void updatefilter(bpfilter &filter, float freq, float bw, float amp);
         float computerolloff(float freq);
         void computefiltercoefs(bpfilter &filter, float freq, float bw, float gain);
         void filter(bpfilter &filter, float *smps);
