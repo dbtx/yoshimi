@@ -43,6 +43,10 @@ SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : Presets(_synth)
     GlobalFilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
     GlobalFilterLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 2, synth);
 
+    OvertonePar1Env = new EnvelopeParams(64, 1, synth);
+    OvertonePar2Env = new EnvelopeParams(64, 1, synth);
+    OvertonePar1Lfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 1, synth);
+    OvertonePar2Lfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 1, synth);
     defaults();
 }
 
@@ -91,6 +95,17 @@ void SUBnoteParameters::defaults(void)
     BandWidthEnvelope->defaults();
     GlobalFilter->defaults();
     GlobalFilterEnvelope->defaults();
+
+    OvertonePar1Env->defaults();
+    OvertonePar1Lfo->defaults();
+    OvertonePar2Env->defaults();
+    OvertonePar2Lfo->defaults();
+
+    AmpLfo->defaults();
+    FreqLfo->defaults();
+    BandWidthLfo->defaults();
+    GlobalFilterLfo->defaults();
+
     profileupdated = true;
     overtoneupdated = true;
 }
@@ -103,6 +118,10 @@ SUBnoteParameters::~SUBnoteParameters()
     delete BandWidthEnvelope;
     delete GlobalFilter;
     delete GlobalFilterEnvelope;
+    delete OvertonePar1Env;
+    delete OvertonePar1Lfo;
+    delete OvertonePar2Env;
+    delete OvertonePar2Lfo;
 }
 
 

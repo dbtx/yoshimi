@@ -279,6 +279,164 @@ this->pars=pars;} {}
   }
 }
 
+class OvertoneParEditor {: {public PresetsUI_} }
+{
+Function {make_window()} {} {
+  Fl_Window subovtpars {
+    label {SUBsynth Overtone Parameters}
+    xywh {19 114 500 230} type Double hide
+    code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth Overtones").c_str());}
+    code1 {o->position(synth->getGuiMaster()->subOvtX, synth->getGuiMaster()->subOvtY);}
+  } {
+
+
+Fl_Group ovtpar1ui {
+  label {Par1 Modifiers}
+  xywh {5 5 490 100} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
+} {
+Fl_Group ovtpar1envgroup {
+  label Envelope
+  xywh {10 25 240 70} box FLAT_BOX color 51 align 144
+  code0 {o->init(pars->OvertonePar1Env, npart, kititem, 1, 3);}
+  code1 {if (pars->POvertonePar1EnvEnabled==0) o->deactivate();}
+  class EnvelopeUI
+} {}
+Fl_Group ovtpar1lfogroup {
+  label LFO
+  xywh {250 25 240 70} box FLAT_BOX color 51 align 124
+  code0 {o->init(pars->OvertonePar1Lfo, npart, kititem, 1, 3);}
+  code1 {if (pars->POvertonePar1LfoEnabled==0) o->deactivate();}
+  class LFOUI
+} {}
+  Fl_Check_Button op1ee {
+    label Enabled
+    callback {//
+pars->POvertonePar1EnvEnabled = o->value();
+if (o->value() == 0)
+  ovtpar1envgroup->deactivate();
+else
+  ovtpar1envgroup->activate();
+o->show();
+ovtpar1ui->redraw();
+send_data (18, o->value(), 0xc0);}
+    xywh {12 28 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
+    code0 {o->value(pars->POvertonePar1EnvEnabled);}
+  }
+  Fl_Check_Button op1le {
+    label Enabled
+    callback {//
+pars->POvertonePar1LfoEnabled = o->value();
+if (o->value() == 0)
+  ovtpar1lfogroup->deactivate();
+else
+  ovtpar1lfogroup->activate();
+o->show();
+ovtpar1ui->redraw();
+send_data (18, o->value(), 0xc0);}
+    xywh {252 28 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
+    code0 {o->value(pars->POvertonePar1LfoEnabled);}
+  }
+}
+
+
+
+Fl_Group ovtpar2ui {
+  label {Par2 Modifiers}
+  xywh {5 105 490 100} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
+} {
+Fl_Group ovtpar2envgroup {
+  label Envelope
+  xywh {10 125 240 70} box FLAT_BOX color 51 align 144
+  code0 {o->init(pars->OvertonePar2Env, npart, kititem, 1, 3);}
+  code1 {if (pars->POvertonePar2EnvEnabled==0) o->deactivate();}
+  class EnvelopeUI
+} {}
+Fl_Group ovtpar2lfogroup {
+  label LFO
+  xywh {250 125 240 70} box FLAT_BOX color 51 align 124
+  code0 {o->init(pars->OvertonePar2Lfo, npart, kititem, 1, 3);}
+  code1 {if (pars->POvertonePar2LfoEnabled==0) o->deactivate();}
+  class LFOUI
+} {}
+  Fl_Check_Button op2ee {
+    label Enabled
+    callback {//
+pars->POvertonePar2EnvEnabled = o->value();
+if (o->value() == 0)
+  ovtpar2envgroup->deactivate();
+else
+  ovtpar2envgroup->activate();
+o->show();
+ovtpar2ui->redraw();
+send_data (18, o->value(), 0xc0);}
+    xywh {12 128 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
+    code0 {o->value(pars->POvertonePar2EnvEnabled);}
+  }
+  Fl_Check_Button op2le {
+    label Enabled
+    callback {//
+pars->POvertonePar2LfoEnabled = o->value();
+if (o->value() == 0)
+  ovtpar2lfogroup->deactivate();
+else
+  ovtpar2lfogroup->activate();
+o->show();
+ovtpar2ui->redraw();
+send_data (18, o->value(), 0xc0);}
+    xywh {252 128 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
+    code0 {o->value(pars->POvertonePar2LfoEnabled);}
+  }
+}
+
+  Fl_Button {} {
+    label Close
+    callback {synth->getGuiMaster()->subOvtX = subovtpars->x();
+synth->getGuiMaster()->subOvtY = subovtpars->y();
+subovtpars->hide();
+}
+    xywh {400 208 90 20} box THIN_UP_BOX labelfont 1 labelsize 11
+  }
+
+}
+
+Function {send_data(int control, float value, int type)} {} {
+    code {//
+collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, 1);} {}
+}
+
+Function {OvertoneParEditor(SUBnoteParameters *_pars, SynthEngine *_synth, int npart_, int kititem_)} {} {
+    code {
+pars = _pars;
+synth = _synth;
+npart = npart_;
+kititem = kititem_;
+//engine = engine_;
+make_window();
+refresh();
+subovtpars->show();} {}
+  }
+  Function {~OvertoneParEditor()} {return_type virtual
+  } {
+    code {//
+    subovtpars->hide();
+    delete(subovtpars);
+    subovtpars = NULL;} {}
+  }
+
+decl {int npart;} {private local
+}
+decl {int kititem;} {private local
+}
+decl {int engine;} {private local
+}
+decl {SynthEngine *synth;} {private local
+}
+decl {SUBnoteParameters *pars;} {private local
+}
+}
+
+}
+
 class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {} {
@@ -382,15 +540,22 @@ send_data (82, o->value(), 0xc0);}
         }
       }
       Fl_Group {} {
-        label OVERTONES
+        label {      OVERTONES}
         xywh {5 395 250 65} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
       } {
+          Fl_Button {} {
+            label Modifiers
+            callback {//
+        if (ovtparui!=NULL) delete ovtparui;
+        ovtparui = new OvertoneParEditor(pars, synth, npart, kititem);}
+            xywh {15 400 70 20} box THIN_UP_BOX labelfont 1 labelsize 11
+          }
         Fl_Choice spreadtype {
-          label {Overtones  Position}
+          label {Overtones Position}
           callback {pars->setOvtPar(0, (int)o->value());
 pars->updateFrequencyMultipliers();
 send_data (51, o->value(), 0xc0);}
-          xywh {20 425 87 20} down_box BORDER_BOX labelsize 10 align 2 textsize 10
+          xywh {15 425 87 20} down_box BORDER_BOX labelsize 10 align 2 textsize 10
           code0 {o->value(pars->POvertoneSpread[0]);}
         } {
           MenuItem {} {
@@ -1063,11 +1228,17 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
 synth = pars->getSynthEngine();
 npart = npart_;
 kititem = kititem_;
+ovtparui = NULL;
 make_window();} {}
   }
   Function {~SUBnoteUI()} {return_type virtual
   } {
     code {//
+    if (ovtparui != NULL)
+    {
+        delete(ovtparui);
+        ovtparui = NULL;
+    }
     SUBparameters->hide();
     delete(SUBparameters);} {}
   }
@@ -1076,6 +1247,8 @@ make_window();} {}
   decl {SUBnoteharmonic *h[MAX_SUB_HARMONICS];} {private local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {OvertoneParEditor *ovtparui;} {public local
   }
   decl {int npart;} {private local
   }

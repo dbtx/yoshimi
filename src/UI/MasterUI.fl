@@ -2162,6 +2162,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   decl {int subNoteO;} {public local
   }
+  decl {int subOvtX;} {public local
+  }
+  decl {int subOvtY;} {public local
+  }
+  decl {int subOvtO;} {public local
+  }
   decl {int padNoteX;} {public local
   }
   decl {int padNoteY;} {public local

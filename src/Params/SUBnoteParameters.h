@@ -83,6 +83,16 @@ class SUBnoteParameters : public Presets
         EnvelopeParams *GlobalFilterEnvelope;
         LFOParams *GlobalFilterLfo;
 
+        // Overtone time-based modifiers
+        unsigned char POvertonePar1LfoEnabled;
+        unsigned char POvertonePar1EnvEnabled;
+        unsigned char POvertonePar2LfoEnabled;
+        unsigned char POvertonePar2EnvEnabled;
+        EnvelopeParams *OvertonePar1Env;
+        EnvelopeParams *OvertonePar2Env;
+        LFOParams *OvertonePar1Lfo;
+        LFOParams *OvertonePar2Lfo;
+
         // Other Parameters
         unsigned char Pfixedfreq;   // If the base frequency is fixed to 440 Hz
 

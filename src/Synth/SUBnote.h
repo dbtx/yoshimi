@@ -82,6 +82,8 @@ class SUBnote : public Carcass, private SynthHelper
         Envelope *AmpEnvelope;
         Envelope *FreqEnvelope;
         Envelope *BandWidthEnvelope;
+        Envelope *OvertonePar1Envelope;
+        Envelope *OvertonePar2Envelope;
 
         Filter *GlobalFilterL,*GlobalFilterR;
 
@@ -91,6 +93,8 @@ class SUBnote : public Carcass, private SynthHelper
         LFO *FilterLfo;
         LFO *FreqLfo;
         LFO *BandWidthLfo;
+        LFO *OvertonePar1Lfo;
+        LFO *OvertonePar2Lfo;
 
         // internal values
         bool NoteEnabled;
