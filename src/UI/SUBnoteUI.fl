@@ -284,26 +284,22 @@ class OvertoneParEditor {: {public PresetsUI_} }
 Function {make_window()} {} {
   Fl_Window subovtpars {
     label {SUBsynth Overtone Parameters}
-    xywh {19 114 500 230} type Double hide
+    xywh {19 114 460 180} type Double hide
     code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth Overtones").c_str());}
     code1 {o->position(synth->getGuiMaster()->subOvtX, synth->getGuiMaster()->subOvtY);}
   } {
 
 
-Fl_Group ovtpar1ui {
-  label {Par1 Modifiers}
-  xywh {5 5 490 100} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
-} {
 Fl_Group ovtpar1envgroup {
-  label Envelope
-  xywh {10 25 240 70} box FLAT_BOX color 51 align 144
+  xywh {5 5 225 70} box FLAT_BOX color 51 align 144
   code0 {o->init(pars->OvertonePar1Env, npart, kititem, 1, 3);}
   code1 {if (pars->POvertonePar1EnvEnabled==0) o->deactivate();}
   class EnvelopeUI
+  label {Par1 Envelope}
 } {}
 Fl_Group ovtpar1lfogroup {
-  label LFO
-  xywh {250 25 240 70} box FLAT_BOX color 51 align 124
+  label {Par1 LFO}
+  xywh {230 5 225 70} box FLAT_BOX color 51 align 124
   code0 {o->init(pars->OvertonePar1Lfo, npart, kititem, 1, 3);}
   code1 {if (pars->POvertonePar1LfoEnabled==0) o->deactivate();}
   class LFOUI
@@ -316,10 +312,10 @@ if (o->value() == 0)
   ovtpar1envgroup->deactivate();
 else
   ovtpar1envgroup->activate();
-o->show();
-ovtpar1ui->redraw();
+ovtpar1envgroup->redraw();
+o->redraw();
 send_data (18, o->value(), 0xc0);}
-    xywh {12 28 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
+    xywh {7 7 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
     code0 {o->value(pars->POvertonePar1EnvEnabled);}
   }
   Fl_Check_Button op1le {
@@ -330,30 +326,26 @@ if (o->value() == 0)
   ovtpar1lfogroup->deactivate();
 else
   ovtpar1lfogroup->activate();
-o->show();
-ovtpar1ui->redraw();
+ovtpar1lfogroup->redraw();
+o->redraw();
 send_data (18, o->value(), 0xc0);}
-    xywh {252 28 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
+    xywh {232 7 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
     code0 {o->value(pars->POvertonePar1LfoEnabled);}
   }
-}
 
 
 
-Fl_Group ovtpar2ui {
-  label {Par2 Modifiers}
-  xywh {5 105 490 100} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
-} {
+
 Fl_Group ovtpar2envgroup {
-  label Envelope
-  xywh {10 125 240 70} box FLAT_BOX color 51 align 144
+  label {Par2 Envelope}
+  xywh {5 80 225 70} box FLAT_BOX color 51 align 144
   code0 {o->init(pars->OvertonePar2Env, npart, kititem, 1, 3);}
   code1 {if (pars->POvertonePar2EnvEnabled==0) o->deactivate();}
   class EnvelopeUI
 } {}
 Fl_Group ovtpar2lfogroup {
-  label LFO
-  xywh {250 125 240 70} box FLAT_BOX color 51 align 124
+  label {Par2 LFO}
+  xywh {230 80 225 70} box FLAT_BOX color 51 align 124
   code0 {o->init(pars->OvertonePar2Lfo, npart, kititem, 1, 3);}
   code1 {if (pars->POvertonePar2LfoEnabled==0) o->deactivate();}
   class LFOUI
@@ -366,10 +358,10 @@ if (o->value() == 0)
   ovtpar2envgroup->deactivate();
 else
   ovtpar2envgroup->activate();
-o->show();
-ovtpar2ui->redraw();
+ovtpar2envgroup->redraw();
+o->redraw();
 send_data (18, o->value(), 0xc0);}
-    xywh {12 128 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
+    xywh {7 82 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
     code0 {o->value(pars->POvertonePar2EnvEnabled);}
   }
   Fl_Check_Button op2le {
@@ -380,13 +372,12 @@ if (o->value() == 0)
   ovtpar2lfogroup->deactivate();
 else
   ovtpar2lfogroup->activate();
-o->show();
-ovtpar2ui->redraw();
+ovtpar2lfogroup->redraw();
+o->redraw();
 send_data (18, o->value(), 0xc0);}
-    xywh {252 128 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
+    xywh {232 82 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
     code0 {o->value(pars->POvertonePar2LfoEnabled);}
   }
-}
 
   Fl_Button {} {
     label Close
@@ -394,7 +385,7 @@ send_data (18, o->value(), 0xc0);}
 synth->getGuiMaster()->subOvtY = subovtpars->y();
 subovtpars->hide();
 }
-    xywh {400 208 90 20} box THIN_UP_BOX labelfont 1 labelsize 11
+    xywh {360 155 95 20} box THIN_UP_BOX labelfont 1 labelsize 11
   }
 
 }

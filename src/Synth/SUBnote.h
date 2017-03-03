@@ -101,6 +101,7 @@ class SUBnote : public Carcass, private SynthHelper
         int firsttick;
         int portamento;
         float volume;
+        float adjustedvolume;
         float oldamplitude;
         float newamplitude;
 
@@ -122,7 +123,7 @@ class SUBnote : public Carcass, private SynthHelper
         };
 
         void initfilter(bpfilter &filter, float freq, float bw, float amp, float mag);
-        inline void updatefilter(bpfilter &filter, float freq, float bw, float amp);
+        inline void updatefilter(bpfilter &filter, float freq, float bw, float amp, float mag);
         float computerolloff(float freq);
         void computefiltercoefs(bpfilter &filter, float freq, float bw, float gain);
         void filter(bpfilter &filter, float *smps);

@@ -123,14 +123,16 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
 
     // select only harmonics that desire to compute
     numharmonics = 0;
+#if 1
     for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
     {
-        if (pars->Phmag[n] == 0)
-            continue;
+        //if (pars->Phmag[n] == 0)
+        //    continue;
         if (n * basefreq > synth->halfsamplerate_f)
             break; // remove the freqs above the Nyquist freq
         pos[numharmonics++] = n;
     }
+#endif
     firstnumharmonics = numharmonics; // (gf)Useful in legato mode.
 
     if (numharmonics == 0)
@@ -234,8 +236,8 @@ void SUBnote::SUBlegatonote(float freq, float velocity,
     int legatonumharmonics = 0;
     for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
     {
-        if (pars->Phmag[n] == 0)
-            continue;
+        //if (pars->Phmag[n] == 0)
+        //    continue;
         if (n * basefreq > synth->samplerate_f / 2.0f)
             break; // remove the freqs above the Nyquist freq
         pos[legatonumharmonics++] = n;
@@ -370,7 +372,7 @@ void SUBnote::prepfilterbank(void)
 
     if (reduceamp < 0.001f)
         reduceamp = 1.0f;
-    volume /= reduceamp;
+    adjustedvolume = volume / reduceamp;
 
 }
 
@@ -433,15 +435,15 @@ void SUBnote::updatefilterbank(void)
             float amp = 1.0f;
             if (nph == 0)
                 amp = gain;
-            updatefilter(lfilter[nph + n * numstages], freq + OffsetHz, bw, amp);
+            updatefilter(lfilter[nph + n * numstages], freq + OffsetHz, bw, amp, hgain);
             if (stereo)
-                updatefilter(rfilter[nph + n * numstages], freq + OffsetHz, bw, amp);
+                updatefilter(rfilter[nph + n * numstages], freq + OffsetHz, bw, amp, hgain);
         }
     }
 
     if (reduceamp < 0.001f)
         reduceamp = 1.0f;
-    volume /= reduceamp;
+    adjustedvolume = volume / reduceamp;
 
 }
 
@@ -498,11 +500,11 @@ void SUBnote::initfilter(bpfilter &filter, float freq, float bw, float amp, floa
             filter.yn2 = 0.0f;
         }
     }
-    updatefilter(filter, freq, bw, amp);
+    updatefilter(filter, freq, bw, amp, mag);
 }
 
 // Modify the filter
-inline void SUBnote::updatefilter(bpfilter &filter, float freq, float bw, float amp)
+inline void SUBnote::updatefilter(bpfilter &filter, float freq, float bw, float amp, float mag)
 {
     filter.amp = amp;
     filter.freq = freq;
@@ -719,7 +721,9 @@ void SUBnote::computecurrentparameters(void)
         float tmpgain = 1.0f / sqrtf(newbw * newfreq);
 
         //move this somewhere
-        updatefilterbank();
+        //updatefilterbank();
+        if ((pars->profileupdated) || (pars->overtoneupdated))
+            updatefilterbank();
 
         for (int n = 0; n < numharmonics; ++n)
         {
@@ -751,7 +755,7 @@ void SUBnote::computecurrentparameters(void)
         oldbandwidth = ctl->bandwidth.data;
         oldpitchwheel = ctl->pitchwheel.data;
     }
-    newamplitude = volume * AmpEnvelope->envout_dB() * AmpLfo->amplfoout() * 2.0f;
+    newamplitude = adjustedvolume * AmpEnvelope->envout_dB() * AmpLfo->amplfoout() * 2.0f;
 
     // Filter
     if (GlobalFilterL != NULL)
@@ -774,6 +778,9 @@ int SUBnote::noteout(float *outl, float *outr)
     memset(outr, 0, synth->p_bufferbytes);
     if (!NoteEnabled)
         return 0;
+
+    //heavy handed unconditional
+    //updatefilterbank();
 
     // left channel
     for (int i = 0; i < synth->p_buffersize; ++i)

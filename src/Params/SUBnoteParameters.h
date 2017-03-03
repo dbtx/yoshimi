@@ -105,7 +105,7 @@ class SUBnoteParameters : public Presets
         bool profileupdated;
         bool overtoneupdated;
 
-        // Overtone spread parameters (type=0,p1=1,p2=2,p3=3)
+        // Overtone parameter struct (type=0,p1=1,p2=2,p3=3)
         unsigned char  POvertoneSpread[4];
         float POvertoneFreqMult[MAX_SUB_HARMONICS];
 

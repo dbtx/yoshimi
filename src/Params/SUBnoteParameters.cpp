@@ -47,6 +47,7 @@ SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : Presets(_synth)
     OvertonePar2Env = new EnvelopeParams(64, 1, synth);
     OvertonePar1Lfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 1, synth);
     OvertonePar2Lfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 1, synth);
+    profileupdated = true;
     defaults();
 }
 
@@ -424,6 +425,10 @@ void SUBnoteParameters::postrender(void)
     = BandWidthLfo->updated
     = GlobalFilterLfo->updated
     = FreqLfo->updated
+    = profileupdated
+    = overtoneupdated
+    = OvertonePar1Lfo->updated
+    = OvertonePar2Lfo->updated
     = false;
 
     return;
