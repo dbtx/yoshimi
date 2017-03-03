@@ -96,6 +96,9 @@ class SUBnote : public Carcass, private SynthHelper
         LFO *OvertonePar1Lfo;
         LFO *OvertonePar2Lfo;
 
+        float POvertoneFreqMult[MAX_SUB_HARMONICS];
+        void updateFrequencyMultipliers(void);
+
         // internal values
         bool NoteEnabled;
         int firsttick;

@@ -44,7 +44,6 @@ class SUBnoteParameters : public Presets
         void defaults(void);
         void getfromXML(XMLwrapper *xml);
         void getLimits(CommandBlock *getData);
-        void updateFrequencyMultipliers(void);
         void postrender(void);
 
         // Amplitude Parametrers
@@ -107,7 +106,6 @@ class SUBnoteParameters : public Presets
 
         // Overtone parameter struct (type=0,p1=1,p2=2,p3=3)
         unsigned char  POvertoneSpread[4];
-        float POvertoneFreqMult[MAX_SUB_HARMONICS];
 
         unsigned char Pnumstages;   // how many times the filters are applied
         unsigned char Pbandwidth;

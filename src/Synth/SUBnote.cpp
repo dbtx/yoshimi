@@ -669,6 +669,72 @@ float SUBnote::computerolloff(float freq)
 }
 
 
+// moved from SUBnoteParameters because Ovt. Env & LFO are per-note affairs
+void SUBnoteParameters::updateFrequencyMultipliers(void)
+{
+    float par1 = POvertoneSpread[1] / 255.0f;
+    float par1pow = powf(10.0f,
+            -(1.0f - POvertoneSpread[1] / 255.0f) * 3.0f);
+    float par2 = POvertoneSpread[2] / 255.0f;
+    float par3 = 1.0f - POvertoneSpread[3] / 255.0f;
+    float result;
+    float tmp = 0.0f;
+    int   thresh = 0;
+
+    for(int n = 0; n < MAX_SUB_HARMONICS; ++n)
+    {
+        float n1     = n + 1.0f;
+        switch(POvertoneSpread[0])
+        {
+            case 1:
+                thresh = (int)(100.0f * par2 * par2) + 1;
+                if (n1 < thresh)
+                    result = n1;
+                else
+                    result = n1 + 8.0f * (n1 - thresh) * par1pow;
+                break;
+
+            case 2:
+                thresh = (int)(100.0f * par2 * par2) + 1;
+                if (n1 < thresh)
+                    result = n1;
+                else
+                    result = n1 + 0.9f * (thresh - n1) * par1pow;
+                break;
+
+            case 3:
+                tmp = par1pow * 100.0f + 1.0f;
+                result = powf(n / tmp, 1.0f - 0.8f * par2) * tmp + 1.0f;
+                break;
+
+            case 4:
+                result = n * (1.0f - par1pow) +
+                    powf(0.1f * n, 3.0f * par2 + 1.0f) *
+                    10.0f * par1pow + 1.0f;
+                break;
+
+            case 5:
+                result = n1 + 2.0f * sinf(n * par2 * par2 * PI * 0.999f) *
+                    sqrt(par1pow);
+                break;
+
+            case 6:
+                tmp    = powf(2.0f * par2, 2.0f) + 0.1f;
+                result = n * powf(par1 * powf(0.8f * n, tmp) + 1.0f, tmp) +
+                    1.0f;
+                break;
+
+            case 7:
+                result = (n1 + par1) / (par1 + 1);
+                break;
+            default:
+                result = n1;
+        }
+        float iresult = floor(result + 0.5f);
+        POvertoneFreqMult[n] = iresult + par3 * (result - iresult);
+    }
+}
+
 // Compute Parameters of SUBnote for each tick
 void SUBnote::computecurrentparameters(void)
 {
@@ -709,16 +775,19 @@ void SUBnote::computecurrentparameters(void)
         }
 
         if (BandWidthEnvelope != NULL)
-        {
             newbw += BandWidthEnvelope->envout();
-        }
+
         if (BandWidthLfo != NULL)
-        {
             newbw += BandWidthLfo->lfoout();
-        }
+
         newbw = powf(2.0, newbw) * ctl->bandwidth.relbw; // bandwidth controller
 
         float tmpgain = 1.0f / sqrtf(newbw * newfreq);
+
+        if (OvertonePar1Envelope != NULL)
+            ovtp1 = pars->POvertoneSpread[1] + OvertonePar1Envelope->envout();
+        if (OvertonePar2Envelope != NULL)
+            ovtp2 = pars->POvertoneSpread[2] + OvertonePar2Envelope->envout();
 
         //move this somewhere
         //updatefilterbank();
