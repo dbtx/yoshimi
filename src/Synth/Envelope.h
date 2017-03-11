@@ -42,7 +42,7 @@ class Envelope : private MiscFuncs
         void relasekey(void);
         float envout(void);
         float envout_dB(void);
-        int finished(void) { return envfinish; };
+        int finished(void) { return envfinish; }
 
     private:
         int envpoints;

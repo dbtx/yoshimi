@@ -85,6 +85,9 @@ class SUBnote : public Carcass, private SynthHelper
         Envelope *OvertonePar1Envelope;
         Envelope *OvertonePar2Envelope;
 
+        float ovtp1;
+        float ovtp2;
+
         Filter *GlobalFilterL,*GlobalFilterR;
 
         Envelope *GlobalFilterEnvelope;

@@ -317,7 +317,7 @@ void SUBnote::prepfilterbank(void)
 
     for (int n = 0; n < numharmonics; ++n)
     {
-        float freq =  basefreq * pars->POvertoneFreqMult[pos[n]];
+        float freq =  basefreq * POvertoneFreqMult[pos[n]];
         overtone_freq[n] = freq;
         overtone_rolloff[n] = computerolloff(freq);
 
@@ -388,7 +388,7 @@ void SUBnote::updatefilterbank(void)
 
     for (int n = 0; n < numharmonics; ++n)
     {
-        float freq =  basefreq * pars->POvertoneFreqMult[pos[n]];
+        float freq =  basefreq * POvertoneFreqMult[pos[n]];
         overtone_freq[n] = freq;
         overtone_rolloff[n] = computerolloff(freq);
 
@@ -648,7 +648,23 @@ void SUBnote::initparameters(float freq)
         GlobalFilterEnvelope = new Envelope(pars->GlobalFilterEnvelope, freq, synth);
         GlobalFilterFreqTracking = pars->GlobalFilter->getfreqtracking(basefreq);
         FilterLfo = new LFO(pars->GlobalFilterLfo, basefreq, synth);
-    }
+    }    
+    if (pars->POvertonePar1EnvEnabled != 0)
+        OvertonePar1Envelope = new Envelope(pars->OvertonePar1Env, freq, synth);
+    else
+        OvertonePar1Envelope = NULL;
+    if (pars->POvertonePar2EnvEnabled != 0)
+        OvertonePar2Envelope = new Envelope(pars->OvertonePar2Env, freq, synth);
+    else
+        OvertonePar2Envelope = NULL;
+    if (pars->POvertonePar1LfoEnabled != 0)
+        OvertonePar1Lfo = new LFO(pars->OvertonePar1Lfo, freq, synth);
+    else
+        OvertonePar1Lfo = NULL;
+    if (pars->POvertonePar2LfoEnabled != 0)
+        OvertonePar2Lfo = new LFO(pars->OvertonePar2Lfo, freq, synth);
+    else
+        OvertonePar2Lfo = NULL;
     computecurrentparameters();
 }
 //end of port
@@ -674,13 +690,13 @@ float SUBnote::computerolloff(float freq)
 
 
 // moved from SUBnoteParameters because Ovt. Env & LFO are per-note affairs
-void SUBnoteParameters::updateFrequencyMultipliers(void)
+void SUBnote::updateFrequencyMultipliers(void)
 {
-    float par1 = POvertoneSpread[1] / 255.0f;
+    float par1 = ovtp1 / 255.0f;
     float par1pow = powf(10.0f,
-            -(1.0f - POvertoneSpread[1] / 255.0f) * 3.0f);
-    float par2 = POvertoneSpread[2] / 255.0f;
-    float par3 = 1.0f - POvertoneSpread[3] / 255.0f;
+            -(1.0f - ovtp1 / 255.0f) * 3.0f);
+    float par2 = ovtp2 / 255.0f;
+    float par3 = 1.0f - pars->POvertoneSpread[3] / 255.0f;
     float result;
     float tmp = 0.0f;
     int   thresh = 0;
@@ -688,7 +704,7 @@ void SUBnoteParameters::updateFrequencyMultipliers(void)
     for(int n = 0; n < MAX_SUB_HARMONICS; ++n)
     {
         float n1     = n + 1.0f;
-        switch(POvertoneSpread[0])
+        switch(pars->POvertoneSpread[0])
         {
             case 1:
                 thresh = (int)(100.0f * par2 * par2) + 1;
@@ -750,10 +766,12 @@ void SUBnote::computecurrentparameters(void)
         || portamento != 0)
 #endif
     {
-
         float newfreq = 1.0f;
         float newbw = 1.0f;
         float gain = 1.0f;
+        float tmpovtp1 = ovtp1 = pars->POvertoneSpread[1];
+        float tmpovtp2 = ovtp2 = pars->POvertoneSpread[2];
+        bool ovtupdated = false;
 
         if (FreqEnvelope != NULL)
         {
@@ -789,13 +807,38 @@ void SUBnote::computecurrentparameters(void)
         float tmpgain = 1.0f / sqrtf(newbw * newfreq);
 
         if (OvertonePar1Envelope != NULL)
-            ovtp1 = pars->POvertoneSpread[1] + OvertonePar1Envelope->envout();
+        {
+            tmpovtp1 *= OvertonePar1Envelope->envout();
+            ovtupdated = true;
+        }
         if (OvertonePar2Envelope != NULL)
-            ovtp2 = pars->POvertoneSpread[2] + OvertonePar2Envelope->envout();
+        {
+            tmpovtp2 *= OvertonePar2Envelope->envout();
+            ovtupdated = true;
+        }
+
+        if (OvertonePar1Lfo != NULL)
+        {
+            tmpovtp1 *= OvertonePar1Lfo->lfoout();
+            ovtupdated = true;
+        }
+        if (OvertonePar2Lfo != NULL)
+        {
+            tmpovtp2 *= OvertonePar2Lfo->lfoout();
+            ovtupdated = true;
+        }
+
+        if (ovtupdated)
+        {
+            ovtp1 = tmpovtp1;
+            ovtp2 = tmpovtp2;
+        }
 
         //move this somewhere
         //updatefilterbank();
-        if ((pars->profileupdated) || (pars->overtoneupdated))
+        if ((pars->overtoneupdated) || (ovtupdated))
+            updateFrequencyMultipliers();
+        if ((pars->profileupdated) || (pars->overtoneupdated) || (ovtupdated))
             updatefilterbank();
 
         for (int n = 0; n < numharmonics; ++n)

@@ -78,7 +78,8 @@ void SUBnoteParameters::defaults(void)
     POvertoneSpread[1] = 0;
     POvertoneSpread[2] = 0;
     POvertoneSpread[3] = 0;
-    updateFrequencyMultipliers();
+    //updateFrequencyMultipliers();
+    overtoneupdated = true;
 
     for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
     {
@@ -97,6 +98,10 @@ void SUBnoteParameters::defaults(void)
     GlobalFilter->defaults();
     GlobalFilterEnvelope->defaults();
 
+    POvertonePar1EnvEnabled = false;
+    POvertonePar2EnvEnabled = false;
+    POvertonePar1LfoEnabled = false;
+    POvertonePar2LfoEnabled = false;
     OvertonePar1Env->defaults();
     OvertonePar1Lfo->defaults();
     OvertonePar2Env->defaults();
@@ -273,7 +278,7 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
             xml->getpar("overtone_spread_par2", POvertoneSpread[2], 0, 255);
         POvertoneSpread[3] =
             xml->getpar("overtone_spread_par3", POvertoneSpread[3], 0, 255);
-        updateFrequencyMultipliers();
+        overtoneupdated = true;
         PDetuneType=xml->getpar127("detune_type",PDetuneType);
 
         Pbandwidth=xml->getpar127("bandwidth",Pbandwidth);

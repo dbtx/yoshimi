@@ -3816,7 +3816,7 @@ void InterChange::commandSub(CommandBlock *getData)
             if (write)
             {
                 pars->POvertoneSpread[1] = value;
-                pars->updateFrequencyMultipliers();
+                pars->overtoneupdated = true;
             }
             else
                 value = pars->POvertoneSpread[1];
@@ -3825,7 +3825,7 @@ void InterChange::commandSub(CommandBlock *getData)
             if (write)
             {
                 pars->POvertoneSpread[2] = value;
-                pars->updateFrequencyMultipliers();
+                pars->overtoneupdated = true;
             }
             else
                 value = pars->POvertoneSpread[2];
@@ -3834,7 +3834,7 @@ void InterChange::commandSub(CommandBlock *getData)
             if (write)
             {
                 pars->POvertoneSpread[3] = value;
-                pars->updateFrequencyMultipliers();
+                pars->overtoneupdated = true;
             }
             else
                 value = pars->POvertoneSpread[3];
@@ -3843,7 +3843,7 @@ void InterChange::commandSub(CommandBlock *getData)
             if (write)
             {
                 pars->POvertoneSpread[0] = value_int;
-                pars->updateFrequencyMultipliers();
+                pars->overtoneupdated = true;
             }
             else
                 value = pars->POvertoneSpread[0];
