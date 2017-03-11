@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified February 2017
+    Modified March 2017
 */
 
 #include <iostream>
@@ -2367,19 +2367,18 @@ bool CmdInterface::cmdIfaceProcessCommand()
     {
         float value;
         unsigned char type = 0;
-        if (matchnMove(3, point, "lim"))
+        if (matchnMove(3, point, "limits"))
             value = FLT_MAX;
         else
         {
             value = string2float(point);
             if (strchr(point, '.') == NULL)
-                type |= 0x80;
+                type |= 0x80; // fix as integer
+            point = skipChars(point);
+            type |= (string2int127(point) & 0x43); // Allow 'pretend' and MIDI learn
+            point = skipChars(point);
         }
-        point = skipChars(point);
-        type |= (string2int127(point) & 0x43);
-        // Fix as from CLI, integer
-        // Allow 'pretend' and MIDI learn
-        point = skipChars(point);
+        type |= 0x10; // Fix as from CLI
         unsigned char control = string2int(point);
         point = skipChars(point);
         unsigned char part = string2int(point);
@@ -2443,8 +2442,42 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
+    if (putData.data.value == FLT_MAX)
+    {
+        synth->interchange.resolveReplies(&putData);
+        string name = miscMsgPop(putData.data.par2) + "\n~ ";
+        putData.data.par2 = par2; // restore this
+        synth->interchange.returnLimits(&putData);
+        unsigned char returntype = putData.data.type;
+        short int min = putData.limits.min;
+        short int def = putData.limits.def;
+        short int max = putData.limits.max;
+        if (min == -1 && def == -10 && max == -1)
+        {
+            synth->getRuntime().Log("Unrecognised Control");
+            return 0;
+        }
+        string valuetype = "   Type ";
+        if (returntype & 0x80)
+            valuetype += " integer";
+        else
+            valuetype += " float";
+        if (returntype & 0x40)
+            valuetype += " learnable";
+
+        string deftype;
+        if (def >= 10 || def <= 0)
+            deftype = to_string(lrint(def / 10));
+        else
+            deftype = to_string(float(def / 10.0f) + 0.000001).substr(0,4);
+
+        synth->getRuntime().Log(name + "Min " + to_string(min)  + "   Def " + deftype + "   Max " + to_string(max) + valuetype);
+        return 0;
+    }
     if (jack_ringbuffer_write_space(synth->interchange.fromCLI) >= commandSize)
+    {
         jack_ringbuffer_write(synth->interchange.fromCLI, (char*) putData.bytes, commandSize);
+    }
     return 0; // no function for this yet
 }
 

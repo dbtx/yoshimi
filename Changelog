@@ -1,6 +1,68 @@
 yoshimi 1.5.0 M
 
-2016-2-26 Will
+2017-3-11 Will
+* Splash timeout is longer and doesn't block user.
+* Fixed regression - exit was always claiming config changed.
+
+2017-3-10 Will
+* Monitoring incoming CCs switch now saved in config.
+* Implimented 'Open learned editor window' switch.
+  Also saved in config.
+
+2017-3-9 Will
+* Improvements to Cli part limits.
+* Successful Midi-learn now opens editing window.
+* PadSynth limits done.
+* Reduced internal multiplier for all limits.
+  Just one went over short int size :(
+* Small optimisation in Controllers limits.
+* Updated docs.
+
+2017-3-6 Will
+* Cli limits now report the full name as well as the values.
+* Bugfix: Cli Add/Sub text not identifying bend & offset.
+* AddSynth limits done.
+* Doc additions and corrections.
+* SubSynth limits done.
+* Corrected wrong AddSynth coarse detune type.
+* Added 'solo' to limits.
+* Optimised limits code in SynthEngine.
+
+2017-3-5 Will
+* Controller & Midi control limits done.
+* Complete limit definitions for main & part include type.
+  i.e. integer/float & whether midi learnable.
+* Doc updates.
+* Bugfix: missed a couple of 'break' statements in a switch.
+* Added a special case for enable default on part 1.
+
+2017-3-4 Will
+* Merged in Jesper's latest tooltip improvements.
+* Voice list panning now syncs random LED in main window.
+* Updated direct access doc.
+* Corrected last few dates in this file :(
+
+2017-3-3 Will
+* Changed confusing naming referring to voice list vibratto.
+  Also improved comment.
+* Improved float/int and float/bool casts in interchange.
+* Gui Addsynth base parameters now go through ring buffers.
+* Reinstated Addsynth base random pan button behaviour.
+* Reinstated random pan button behaviour to all others.
+
+2017-3-2 Will
+* Main part limits done (not controllers)
+* Master limits done.
+* Bugfix: Gui changing available parts requered two clicks.
+* Fixed new regression. Cli was never just reading values.
+* Gui LFOs now go entirely through ring buffers.
+
+2017-3-1 Will
+* Started identifying default and limit values for part.
+  Cli direct access uses "lim" instead of value and type.
+* Small adjustment to part label display.
+
+2017-2-26 Will
 * Fixed instrument background colours.
 
 2017-2-24 Will

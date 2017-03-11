@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2017
+    Modified March 2017
 */
 
 #include <cstring>
@@ -1503,4 +1503,153 @@ void Part::getfromXML(XMLwrapper *xml)
         ctl->getfromXML(xml);
         xml->exitbranch();
     }
+}
+
+
+void Part::getLimits(CommandBlock *getData)
+{
+    unsigned int type = getData->data.type;
+    int control = getData->data.control;
+    int npart = getData->data.part;
+
+    // defaults
+    int min = 0;
+    int def = 640;
+    int max = 127;
+    //cout << "part control " << to_string(control) << endl;
+    if ((control >= 128 && control <= 168) || control == 224)
+    {
+        ctl->getLimits(getData);
+        return;
+    }
+
+    switch (control)
+    {
+        case 0:
+            type &= 0x3f;
+            type |= 0x40;
+            def = 960;
+            break;
+
+        case 1:
+        case 4:
+            type |= 0x40;
+            break;
+
+        case 2:
+            type &= 0x3f;
+            type |= 0x40;
+            break;
+
+        case 5:
+            min = 1;
+            def = 10;
+            max = 16;
+            break;
+
+        case 6:
+            def = 0;
+            max = 2;
+            break;
+
+        case 7:
+        case 57:
+            def = 0;
+            max = 1;
+            break;
+
+        case 8:
+            if (npart == 0)
+                def = 10;
+            else
+                def = 0;
+            max = 1;
+            break;
+
+        case 9:
+            def = 0;
+            max = 1;
+            break;
+
+        case 16:
+            def = 0;
+            break;
+
+        case 17:
+            def = 1270;
+            break;
+
+        case 18:
+        case 19:
+        case 20:
+        case 96:
+            min = 0;
+            def = 0;
+            max = 0;
+            break;
+
+        case 33:
+            def = 200;
+            max = 60;
+            break;
+
+        case 35:
+            min = -36;
+            def = 0;
+            max = 36;
+            break;
+
+        case 40:
+        case 41:
+        case 42:
+        case 43:
+            type |= 0x40;
+            def = 0;
+            break;
+
+        case 48:
+            def = 0;
+            max = 50;
+            break;
+
+        case 58:
+            def = 0;
+            max = 3;
+            break;
+        case 120:
+            min = 1;
+            def = 10;
+            max = 3;
+            break;
+
+        // the following are learnable MIDI controllers
+        case 192:
+        case 197:
+        case 198:
+            type |= 0x40;
+            break;
+
+        case 194:
+            type |= 0x40;
+            def = 1270;
+            break;
+
+        // these haven't been done
+        case 193:
+            break;
+        case 195:
+            break;
+        case 196:
+            break;
+
+        default:
+            min = -1;
+            def = -10;
+            max = -1;
+            break;
+    }
+    getData->data.type = type;
+    getData->limits.min = min;
+    getData->limits.def = def;
+    getData->limits.max = max;
 }

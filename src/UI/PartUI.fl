@@ -29,8 +29,8 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified February 2017
-} {in_source in_header
+Modified March 2017
+} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -44,7 +44,7 @@ decl {\#include "UI/MiscGui.h"
     \#include "ADnoteUI.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
-    \#include "WidgetMWSliderUI.h"
+    \#include "UI/WidgetMWSlider.h"
     \#include "Params/Controller.h"
     \#include "Misc/MiscFuncs.h"} {public global
 }
@@ -417,7 +417,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 }
 
-class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -437,7 +437,11 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
         Fl_Box instrumentpadbox {
           xywh {262 9 63 16} box FLAT_BOX
         }
-        Fl_Button instrumentlabel {
+        Fl_Text_Display instrumentlabel {
+          comment {We need this to stop the text ovewriting without the background redrawn}
+          xywh {134 24 192 1} box NO_BOX labelfont 1 labelsize 12 align 65 textsize 12
+        }
+        Fl_Button instrumentlab {
           callback {//
     int event = Fl::event_button();
     const char *tmp = NULL;
@@ -510,7 +514,7 @@ send_data(4, o->value(), 0xc8);}
     if (Fl::event_button() == 3)
         o->value(96);
     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-      synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, (127 - o->value()));
+      synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
     send_data(0, o->value(), 0x48);}
           xywh {336 42 31 31} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -703,7 +707,7 @@ else
     } {
       Fl_Dial volrng {
         label {Vol Rng}
-        callback {part->ctl->setvolume((char)o->value());
+        callback {//part->ctl->setvolume((char)o->value());
 send_data(128, o->value(), 0xc0);}
         tooltip {Volume Range} xywh {132 55 30 30} labelsize 10 minimum 64 maximum 127 step 1
         code0 {o->value(part->ctl->volume.data);}
@@ -719,7 +723,7 @@ send_data(129, o->value(), 0xc0);}
       }
       Fl_Dial panwidth {
         label PanWdth
-        callback {part->ctl->setPanDepth((char)o->value());
+        callback {//part->ctl->setPanDepth((char)o->value());
 send_data(130, o->value(), 0xc0);}
         tooltip {Panning Width} xywh {10 55 30 30} labelsize 10 maximum 64 step 1
         code0 {o->value(part->ctl->panning.depth);}
@@ -728,7 +732,7 @@ send_data(130, o->value(), 0xc0);}
       }
       Fl_Dial modwh {
         label ModWh
-        callback {part->ctl->modwheel.depth = o->value();
+        callback {//part->ctl->modwheel.depth = o->value();
 send_data(131, o->value(), 0xc0);}
         tooltip {Modulation Wheel depth} xywh {50 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->modwheel.depth);}
@@ -744,7 +748,7 @@ send_data(132, o->value(), 0xc0);}
       }
       Fl_Dial bwdpth {
         label BwDpth
-        callback {part->ctl->bandwidth.depth = o->value();
+        callback {//part->ctl->bandwidth.depth = o->value();
 send_data(133, o->value(), 0xc0);}
         tooltip {BandWidth depth} xywh {125 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->bandwidth.depth);}
@@ -795,7 +799,7 @@ send_data(138, o->value(), 0xc0);}
       }
       Fl_Dial filtq {
         label FltQ
-        callback {part->ctl->filterq.depth = o->value();
+        callback {//part->ctl->filterq.depth = o->value();
 send_data(139, o->value(), 0xc0);}
         tooltip {Filter Q depth} xywh {50 55 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filterq.depth);}
@@ -804,7 +808,7 @@ send_data(139, o->value(), 0xc0);}
       }
       Fl_Dial fltcut {
         label FltCut
-        callback {part->ctl->filtercutoff.depth = o->value();
+        callback {//part->ctl->filtercutoff.depth = o->value();
 send_data(140, o->value(), 0xc0);}
         tooltip {Filter Cutoff depth} xywh {90 55 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filtercutoff.depth);}
@@ -1492,7 +1496,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     {
         int displaypart = newpart % NUM_MIDI_CHANNELS;
         if (control == 0)
-            synth->getGuiMaster()->panellistitem[displaypart]->partvolume->value(127 - value);
+            synth->getGuiMaster()->panellistitem[displaypart]->partvolume->value(value);
         else if (control == 2)
             synth->getGuiMaster()->panellistitem[displaypart]->partpanning->value(value);
         else if (control == 5)
