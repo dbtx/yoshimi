@@ -339,6 +339,7 @@ configure_file(
     "${CMAKE_CURRENT_BINARY_DIR}/yoshimi.desktop"
     IMMEDIATE @ONLY)
 
+# separated as LV2 doesn't need them
 set (CmdInterface_sources
     Interface/CmdInterface.cpp
     Interface/CmdInterface.h
@@ -762,7 +763,7 @@ if (LV2Plugin)
 
     SET_TARGET_PROPERTIES(yoshimi_lv2 PROPERTIES
         PREFIX ""
-        COMPILE_DEFINITIONS "YOSHIMI_LV2_PLUGIN=1"
+        #COMPILE_DEFINITIONS "YOSHIMI_LV2_PLUGIN=1"
     )
 
     include_directories (AFTER
