@@ -385,7 +385,7 @@ set (Effects_sources
     Effects/Reverb.h
 )
 
-set (Interface_Sources
+set (Interface_sources
     Interface/InterChange.cpp
     Interface/InterChange.h
     Interface/MidiLearn.cpp
@@ -572,7 +572,7 @@ set (ProgSources
     ${DSP_sources}
     ${Effects_sources}
     ${FltkUI_sources}
-    ${Interface_Sources}
+    ${Interface_sources}
     ${Misc_sources}
     ${MusicIO_sources}
     ${Params_sources}
