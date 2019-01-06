@@ -339,58 +339,156 @@ configure_file(
     "${CMAKE_CURRENT_BINARY_DIR}/yoshimi.desktop"
     IMMEDIATE @ONLY)
 
+set (CmdInterface_sources
+    Interface/CmdInterface.cpp
+    Interface/CmdInterface.h
+)
+
 set (DSP_sources
-    DSP/FFTwrapper.cpp  DSP/AnalogFilter.cpp  DSP/FormantFilter.cpp
-    DSP/SVFilter.cpp  DSP/Filter.cpp  DSP/Unison.cpp
+    DSP/AnalogFilter.cpp
+    DSP/AnalogFilter.h
+    DSP/FFTwrapper.cpp
+    DSP/FFTwrapper.h
+    DSP/Filter.cpp
+    DSP/Filter.h
+    DSP/FormantFilter.cpp
+    DSP/FormantFilter.h
+    DSP/SVFilter.cpp
+    DSP/SVFilter.h
+    DSP/Unison.cpp
+    DSP/Unison.h
 )
 
 set (Effects_sources
-    Effects/Alienwah.cpp  Effects/Chorus.cpp  Effects/Echo.cpp
-    Effects/EffectLFO.cpp  Effects/EffectMgr.cpp  Effects/Effect.cpp
-    Effects/Phaser.cpp  Effects/Reverb.cpp  Effects/EQ.cpp
-    Effects/Distorsion.cpp  Effects/DynamicFilter.cpp
-)
-
-set (Misc_sources
-    Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp  Misc/Splash.cpp
-    Misc/Microtonal.cpp   Misc/Part.cpp  Misc/XMLwrapper.cpp  Misc/MiscFuncs.cpp   Misc/WavFile.cpp
+    Effects/Alienwah.cpp
+    Effects/Alienwah.h
+    Effects/Chorus.cpp
+    Effects/Chorus.h
+    Effects/Distorsion.cpp
+    Effects/Distorsion.h
+    Effects/DynamicFilter.cpp
+    Effects/DynamicFilter.h
+    Effects/Echo.cpp
+    Effects/Echo.h
+    Effects/Effect.cpp
+    Effects/Effect.h
+    Effects/EffectLFO.cpp
+    Effects/EffectLFO.h
+    Effects/EffectMgr.cpp
+    Effects/EffectMgr.h
+    Effects/EQ.cpp
+    Effects/EQ.h
+    Effects/Phaser.cpp
+    Effects/Phaser.h
+    Effects/Reverb.cpp
+    Effects/Reverb.h
 )
 
 set (Interface_Sources
-    Interface/CmdInterface.cpp
     Interface/InterChange.cpp
+    Interface/InterChange.h
     Interface/MidiLearn.cpp
+    Interface/MidiLearn.h
     Interface/MidiDecode.cpp
+    Interface/MidiDecode.h
     UI/MiscGui.cpp
+    UI/MiscGui.h
 )
 
-set (Params_sources
-    Params/ADnoteParameters.cpp  Params/EnvelopeParams.cpp
-    Params/FilterParams.cpp  Params/LFOParams.cpp
-    Params/SUBnoteParameters.cpp  Params/PADnoteParameters.cpp
-    Params/Controller.cpp  Params/Presets.cpp
-    Params/PresetsStore.cpp  Params/UnifiedPresets.cpp
-)
-
-set (Synth_sources
-    Synth/ADnote.cpp  Synth/Envelope.cpp  Synth/LFO.cpp  Synth/OscilGen.cpp
-    Synth/SUBnote.cpp  Synth/Resonance.cpp  Synth/PADnote.cpp
+set (Misc_sources
+    Misc/Bank.cpp
+    Misc/Bank.h
+    Misc/Config.cpp
+    Misc/Config.h
+    Misc/Microtonal.cpp
+    Misc/Microtonal.h
+    Misc/MiscFuncs.cpp
+    Misc/MiscFuncs.h
+    Misc/Part.cpp
+    Misc/Part.h
+    Misc/Splash.cpp
+    Misc/Splash.h
+    Misc/SynthEngine.cpp
+    Misc/SynthEngine.h
+    Misc/WavFile.cpp
+    Misc/WavFile.h
+    Misc/XMLwrapper.cpp
+    Misc/XMLwrapper.h
 )
 
 set (MusicIO_sources
-    MusicIO/MusicClient.cpp  MusicIO/MusicIO.cpp  MusicIO/JackEngine.cpp
     MusicIO/AlsaEngine.cpp
+    MusicIO/AlsaEngine.h
+    MusicIO/JackEngine.cpp
+    MusicIO/JackEngine.h
+    MusicIO/MusicClient.cpp
+    MusicIO/MusicClient.h
+    MusicIO/MusicIO.cpp
+    MusicIO/MusicIO.h
+)
+
+set (Params_sources
+    Params/ADnoteParameters.cpp
+    Params/ADnoteParameters.h
+    Params/Controller.cpp
+    Params/Controller.h
+    Params/EnvelopeParams.cpp
+    Params/EnvelopeParams.h
+    Params/FilterParams.cpp
+    Params/FilterParams.h
+    Params/LFOParams.cpp
+    Params/LFOParams.h
+    Params/PADnoteParameters.cpp
+    Params/PADnoteParameters.h
+    Params/Presets.cpp
+    Params/Presets.h
+    Params/PresetsStore.cpp
+    Params/PresetsStore.h
+    Params/SUBnoteParameters.cpp
+    Params/SUBnoteParameters.h
+    Params/UnifiedPresets.cpp
+    Params/UnifiedPresets.h
+)
+
+set (Synth_sources
+    Synth/ADnote.cpp
+    Synth/ADnote.h
+    Synth/Envelope.cpp
+    Synth/Envelope.h
+    Synth/LFO.cpp
+    Synth/LFO.h
+    Synth/OscilGen.cpp
+    Synth/OscilGen.h
+    Synth/PADnote.cpp
+    Synth/PADnote.h
+    Synth/Resonance.cpp
+    Synth/Resonance.h
+    Synth/SUBnote.cpp
+    Synth/SUBnote.h
 )
 
 set (FltkUI_names
-    "PresetsUI" "EnvelopeUI"
-    "LFOUI" "FilterUI" "VirKeyboardUI"
-    "ConfigUI" "SUBnoteUI" "ResonanceUI"
-    "OscilGenUI" "ADnoteUI" "PADnoteUI"
-    "EffUI" "BankUI" "PartUI"
-    "MicrotonalUI" "MasterUI" "MasterMiscUI"
-    "ParametersUI" "ConsoleUI" "VectorUI"
+    "ADnoteUI"
+    "BankUI"
+    "ConfigUI"
+    "ConsoleUI"
+    "EffUI"
+    "EnvelopeUI"
+    "FilterUI"
+    "LFOUI"
+    "MasterMiscUI"
+    "MasterUI"
+    "MicrotonalUI"
     "MidiLearnUI"
+    "OscilGenUI"
+    "PADnoteUI"
+    "ParametersUI"
+    "PartUI"
+    "PresetsUI"
+    "ResonanceUI"
+    "SUBnoteUI"
+    "VectorUI"
+    "VirKeyboardUI"
 )
 
 # workaround fltk_wrap_ui breakage
@@ -412,8 +510,11 @@ endforeach(basename ${FltkUI_names})
 set (FltkUI_sources
     ${FltkUI_sources}
     UI/DynamicTooltip.cpp
+    UI/DynamicTooltip.h
     UI/WidgetPDial.cpp
+    UI/WidgetPDial.h
     UI/WidgetMWSlider.cpp
+    UI/WidgetMWSlider.h
 )
 
 add_definitions (
@@ -466,37 +567,38 @@ if (HasJackLatency)
 endif (HasJackLatency)
 
 set (ProgSources
-    ${Interface_Sources}
-    ${Misc_sources}
-    ${Params_sources}
-    ${Synth_sources}
+    ${CmdInterface_sources}
     ${DSP_sources}
     ${Effects_sources}
-    ${MusicIO_sources}
     ${FltkUI_sources}
+    ${Interface_Sources}
+    ${Misc_sources}
+    ${MusicIO_sources}
+    ${Params_sources}
+    ${Synth_sources}
 )
 
 include_directories (AFTER
-    ${MXML_INCLUDE_DIRS}
     ${ALSA_INCLUDE_DIRS}
-    ${JACK_INCLUDE_DIRS}
-    ${FONTCONFIG_INCLUDE_DIRS}
-    ${FLTK_INCLUDE_DIR}
     ${FFTW3F_INC_DIR}
+    ${FLTK_INCLUDE_DIR}
+    ${FONTCONFIG_INCLUDE_DIRS}
+    ${JACK_INCLUDE_DIRS}
     ${LIBCAIRO_INCLUDE_DIRS}
+    ${MXML_INCLUDE_DIRS}
     ${Readline_INCLUDE_DIR}
 )
 
 set(ExternLibraries
-    ${FONTCONFIG_LIBRARIES}
-    ${FLTK_LIBRARIES}
-    ${MXML_LIBRARIES}
     ${ALSA_LIBRARIES}
-    ${JACK_LIBRARIES}
-    ${LIBSNDFILE_LIBRARIES}
-    ${FFTW3F_LIBRARIES}
-    ${LIBCAIRO_LIBRARIES}
     ${CURSES_LIBRARIES}
+    ${FFTW3F_LIBRARIES}
+    ${FLTK_LIBRARIES}
+    ${FONTCONFIG_LIBRARIES}
+    ${JACK_LIBRARIES}
+    ${LIBCAIRO_LIBRARIES}
+    ${LIBSNDFILE_LIBRARIES}
+    ${MXML_LIBRARIES}
     ${Readline_LIBRARY}
     z
     #dl
@@ -600,7 +702,6 @@ add_custom_target (distclean
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
-
 if (LV2Plugin)
     if (EXISTS $ENV{LV2_PATH})
         set(LV2_INSTALL_DIR $ENV{LV2_PATH} CACHE PATH
@@ -616,5 +717,81 @@ if (LV2Plugin)
     else (LV2_FOUND)
         message (FATAL_ERROR "lv2 package required but not found (version 1.0.0 needed)")
     endif (LV2_FOUND)
-    add_subdirectory(LV2_Plugin)
+    #    add_subdirectory(LV2_Plugin)
+
+    #add_definitions (-DYOSHIMI_LV2_PLUGIN=1)
+
+    set (LV2_plugin_sources
+        LV2_Plugin/YoshimiLV2Plugin.cpp
+        LV2_Plugin/YoshimiLV2Plugin.h
+        LV2_Plugin/lv2extui.h
+        LV2_Plugin/lv2extprg.h
+
+        Misc/Bank.cpp
+        Misc/Bank.h
+        Misc/Config.cpp
+        Misc/Config.h
+    )
+
+    set (yoshimi_manifest_ttl
+        LV2_Plugin/manifest.ttl
+    )
+
+    set (yoshimi_plugin_ttl
+        LV2_Plugin/yoshimi.ttl
+    )
+
+    add_library (yoshimi_lv2 MODULE
+        ${LV2_plugin_sources}
+        ${yoshimi_manifest_ttl}
+        ${yoshimi_plugin_ttl}
+        ${DSP_sources}
+        ${Effects_sources}
+        ${FltkUI_sources}
+        ${Interface_sources}
+        ${Misc_sources}
+        ${MusicIO_sources}
+        ${Params_sources}
+        ${Synth_sources}
+    )
+
+    add_custom_target(yoshimi_lv2_ttl
+    #   COMMAND test -f ${yoshimi_manifest_ttl}
+    #   COMMAND test -f ${yoshimi_plugin_ttl}
+    )
+
+    SET_TARGET_PROPERTIES(yoshimi_lv2 PROPERTIES
+        PREFIX ""
+        COMPILE_DEFINITIONS "YOSHIMI_LV2_PLUGIN=1"
+    )
+
+    include_directories (AFTER
+        ${LV2_INCLUDE_DIRS}
+        ${FLTK_INCLUDE_DIR}
+        ${MXML_INCLUDE_DIRS}
+        ${FONTCONFIG_INCLUDE_DIRS}
+        ${FFTW3F_INC_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_SOURCE_DIR}
+    )
+
+    target_link_libraries(yoshimi_lv2
+        ${LV2_LIBRARIES}
+        ${FLTK_LIBRARIES}
+        ${MXML_LIBRARIES}
+        ${LIBSNDFILE_LIBRARIES}
+        ${FFTW3F_LIBRARIES}
+        ${LIBCAIRO_LIBRARIES}
+        ${JACK_LIBRARIES}
+        z
+        ${LIBDL_LINUX_LIBS}
+    )
+
+    add_dependencies(yoshimi_lv2 yoshimi_lv2_ttl)
+
+    install (TARGETS yoshimi_lv2 DESTINATION ${LV2_INSTALL_DIR}/yoshimi.lv2)
+    install (FILES ${yoshimi_manifest_ttl} ${yoshimi_plugin_ttl}
+      DESTINATION ${LV2_INSTALL_DIR}/yoshimi.lv2
+)
+
 endif (LV2Plugin)
