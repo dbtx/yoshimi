@@ -568,7 +568,7 @@ if (HasJackLatency)
 endif (HasJackLatency)
 
 set (ProgSources
-    ${CmdInterface_sources}
+#    ${CmdInterface_sources}
     ${DSP_sources}
     ${Effects_sources}
     ${FltkUI_sources}
@@ -609,10 +609,10 @@ set(ExternLibraries
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
     link_directories(/usr/local/lib)
 endif()
+add_library (yoshimi_core STATIC ${ProgSources})
+add_executable (yoshimi ${CmdInterface_sources} main.cpp)
 
-add_executable (yoshimi ${ProgSources} main.cpp)
-
-target_link_libraries (yoshimi ${ExternLibraries})
+target_link_libraries (yoshimi ${ExternLibraries} yoshimi_core)
 
 
 
@@ -728,10 +728,10 @@ if (LV2Plugin)
         LV2_Plugin/lv2extui.h
         LV2_Plugin/lv2extprg.h
 
-        Misc/Bank.cpp
-        Misc/Bank.h
-        Misc/Config.cpp
-        Misc/Config.h
+#        Misc/Bank.cpp
+#        Misc/Bank.h
+#        Misc/Config.cpp
+#        Misc/Config.h
     )
 
     set (yoshimi_manifest_ttl
@@ -746,14 +746,6 @@ if (LV2Plugin)
         ${LV2_plugin_sources}
         ${yoshimi_manifest_ttl}
         ${yoshimi_plugin_ttl}
-        ${DSP_sources}
-        ${Effects_sources}
-        ${FltkUI_sources}
-        ${Interface_sources}
-        ${Misc_sources}
-        ${MusicIO_sources}
-        ${Params_sources}
-        ${Synth_sources}
     )
 
     add_custom_target(yoshimi_lv2_ttl
@@ -777,6 +769,7 @@ if (LV2Plugin)
     )
 
     target_link_libraries(yoshimi_lv2
+        yoshimi_core
         ${LV2_LIBRARIES}
         ${FLTK_LIBRARIES}
         ${MXML_LIBRARIES}
