@@ -609,10 +609,10 @@ set(ExternLibraries
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
     link_directories(/usr/local/lib)
 endif()
-add_library (yoshimi_core STATIC ${ProgSources})
+add_library (yoshimi_common STATIC ${ProgSources})
 add_executable (yoshimi ${CmdInterface_sources} main.cpp)
 
-target_link_libraries (yoshimi ${ExternLibraries} yoshimi_core)
+target_link_libraries (yoshimi ${ExternLibraries} yoshimi_common)
 
 
 
@@ -769,7 +769,7 @@ if (LV2Plugin)
     )
 
     target_link_libraries(yoshimi_lv2
-        yoshimi_core
+        yoshimi_common
         ${LV2_LIBRARIES}
         ${FLTK_LIBRARIES}
         ${MXML_LIBRARIES}
