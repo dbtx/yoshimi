@@ -86,7 +86,7 @@ option (BuildForNEON "Build for ARM Cortex A9 system" OFF)
 option (BuildForThisCPU "Build for presently running system" OFF)
 option (BuildForDebug "Debug build without optimisation. Enable gdb debugging support" OFF)
 
-#option to build lv2 plugin
+# option to build lv2 plugin
 option (LV2Plugin "Build yoshimi lv2 plugin interface" ON)
 
 # developer info
@@ -94,19 +94,27 @@ option (ShowGuiReports "Enable GUI control reports" OFF)
 option (ShowNoteOnTimes "Report Note-On Times" OFF)
 option (ReportNotes "Report Notes On/Off" OFF)
 
+set (BuildOptionsBasic
+    " -ffast-math -fomit-frame-pointer"
+    CACHE STRING "basic compilier options"
+)
+
+set (BuildOptionsCommon
+    "${BuildOptionsBasic} -msse -msse2 -mfpmath=sse"
+)
 
 set (BuildOptions_X86
-    "-msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
+    "${BuildOptionsCommon}"
     CACHE STRING "basic X86 compiler options"
 )
 
 set (BuildOptions_X86_64AMD
-    "-march=athlon64 -m64 -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+    "${BuildOptionsCommon} -march=athlon64 -m64 -Wall -fno-finite-math-only"
   CACHE STRING "X86_64 compiler options"
 )
 
 set (BuildOptions_X86_64Core2
-    "-march=core2 -m64 -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+    "${BuildOptionsCommon} -march=core2 -m64 -Wall -fno-finite-math-only"
   CACHE STRING "X86_64 compiler options"
 )
 
@@ -116,20 +124,20 @@ set (BuildOptions_NEON
 )
 
 set (BuildOptionsThisCPU
-    "-march=native -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+    "${BuildOptionsCommon} -march=native -Wall -fno-finite-math-only"
   CACHE STRING "Current CPU compiler options"
 )
 
-set (BuildOptionsBasic
-    "-ffast-math -fomit-frame-pointer"
-    CACHE STRING "basic compilier options"
+set (BuildOptionsDebug
+    "-O0 -g3 -ggdb -Wpointer-arith -Wpedantic -Wextra" CACHE STRING "Compile without optimisation and with debug information"
 )
 
-set (BuildOptionsDebug
-    "-O0 -g3 -ggdb -Wpointer-arith -Wpedantic -Wextra" CACHE STRING "Compile without optimisation and with debug information")
 set (BuildOptionsRelease
-    "-O3" CACHE STRING "Compile with optimisation for Release builds")
+    "-O3" CACHE STRING "Compile with optimisation for Release builds"
+)
 
+
+# external dependencies
 find_package (PkgConfig REQUIRED)
 if (PKG_CONFIG_FOUND)
     message(STATUS "Found pkg-config ${PKG_CONFIG_EXECUTABLE}")
@@ -558,7 +566,6 @@ if (HasJackLatency)
 endif (HasJackLatency)
 
 set (ProgSources
-#    ${CmdInterface_sources}
     ${DSP_sources}
     ${Effects_sources}
     ${FltkUI_sources}
@@ -708,20 +715,12 @@ if (LV2Plugin)
     else (LV2_FOUND)
         message (FATAL_ERROR "lv2 package required but not found (version 1.0.0 needed)")
     endif (LV2_FOUND)
-    #    add_subdirectory(LV2_Plugin)
-
-    #add_definitions (-DYOSHIMI_LV2_PLUGIN=1)
 
     set (LV2_plugin_sources
         LV2_Plugin/YoshimiLV2Plugin.cpp
         LV2_Plugin/YoshimiLV2Plugin.h
         LV2_Plugin/lv2extui.h
         LV2_Plugin/lv2extprg.h
-
-#        Misc/Bank.cpp
-#        Misc/Bank.h
-#        Misc/Config.cpp
-#        Misc/Config.h
     )
 
     set (yoshimi_manifest_ttl
@@ -746,7 +745,6 @@ if (LV2Plugin)
 
     SET_TARGET_PROPERTIES(yoshimi_lv2 PROPERTIES
         PREFIX ""
-        #COMPILE_DEFINITIONS "YOSHIMI_LV2_PLUGIN=1"
     )
 
     include_directories (AFTER
