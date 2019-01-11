@@ -167,22 +167,12 @@ if (NOT LIBC_HAS_ARGP)
 endif(NOT LIBC_HAS_ARGP)
 
 # libz
-set (CMAKE_REQUIRED_LIBRARIES z)
-check_c_source_compiles (
-    "#include <zlib.h>
-     #include <stdlib.h>
-     int main(int argc, char **argv) {
-         gzFile zzz  = gzopen(\"/dev/null\", \"rb\");
-         if (NULL != zzz)
-            gzclose(zzz);
-         return 0;
-     }" HAS_LIBZ
-)
-if (HAS_LIBZ)
-    message(STATUS "Found libz")
-else (HAS_LIBZ)
-    message(FATAL_ERROR "libz required but not found: ${HAS_LIBZ}")
-endif (HAS_LIBZ)
+find_package(ZLIB REQUIRED)
+if (ZLIB_FOUND)
+#    message(STATUS "Found Zlib" ${ZLIB_VERSION_STRING})
+else (ZLIB_FOUND)
+    message(FATAL_ERROR "libz required but not found: ${ZLIB_FOUND}")
+endif (ZLIB_FOUND)
 
 # fftw3f
 pkg_check_modules (FFTW3F REQUIRED fftw3f>=0.22)
@@ -588,6 +578,7 @@ include_directories (AFTER
     ${LIBCAIRO_INCLUDE_DIRS}
     ${MXML_INCLUDE_DIRS}
     ${Readline_INCLUDE_DIR}
+    ${ZLIB_INCLUDE_DIRS}
 )
 
 set(ExternLibraries
@@ -602,7 +593,7 @@ set(ExternLibraries
     ${LIBSNDFILE_LIBRARIES}
     ${MXML_LIBRARIES}
     ${Readline_LIBRARY}
-    z
+    ${ZLIB_LIBRARIES}
 )
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
@@ -759,13 +750,14 @@ if (LV2Plugin)
     )
 
     include_directories (AFTER
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_SOURCE_DIR}
         ${LV2_INCLUDE_DIRS}
         ${FLTK_INCLUDE_DIR}
         ${MXML_INCLUDE_DIRS}
         ${FONTCONFIG_INCLUDE_DIRS}
         ${FFTW3F_INC_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_SOURCE_DIR}
+        ${ZLIB_INCLUDE_DIRS}
     )
 
     target_link_libraries(yoshimi_lv2
@@ -778,7 +770,7 @@ if (LV2Plugin)
         ${LIBSNDFILE_LIBRARIES}
         ${LV2_LIBRARIES}
         ${MXML_LIBRARIES}
-        z
+        ${ZLIB_LIBRARIES}
     )
 
     add_dependencies(yoshimi_lv2 yoshimi_lv2_ttl)
