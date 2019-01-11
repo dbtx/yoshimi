@@ -598,12 +598,11 @@ set(ExternLibraries
     ${FONTCONFIG_LIBRARIES}
     ${JACK_LIBRARIES}
     ${LIBCAIRO_LIBRARIES}
+    ${LIBDL_LINUX}
     ${LIBSNDFILE_LIBRARIES}
     ${MXML_LIBRARIES}
     ${Readline_LIBRARY}
     z
-    #dl
-    ${LIBDL_LINUX}
 )
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
