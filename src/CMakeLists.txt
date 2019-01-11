@@ -303,21 +303,21 @@ set (YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
 
 # set platform specific compiler flags
 if (BuildFor0ld_X86)
-    set (CMAKE_CXX_FLAGS ${BuildOptions_X86})
+    set (OurCxxFlags ${BuildOptions_X86})
 else (BuildFor0ld_X86)
     if (BuildForAMD_X86_64)
-        set (CMAKE_CXX_FLAGS ${BuildOptions_X86_64AMD})
+        set (OurCxxFlags ${BuildOptions_X86_64AMD})
     else (BuildForAMD_X86_64)
         if (BuildForCore2_X86_64)
-            set (CMAKE_CXX_FLAGS ${BuildOptions_X86_64Core2})
+            set (OurCxxFlags ${BuildOptions_X86_64Core2})
         else (BuildForCore2_X86_64)
             if (BuildForNEON)
-                set (CMAKE_CXX_FLAGS ${BuildOptions_NEON})
+                set (OurCxxFlags ${BuildOptions_NEON})
             else (BuildForNEON)
                 if (BuildForThisCPU)
-                    set (CMAKE_CXX_FLAGS ${BuildOptionsThisCPU})
+                    set (OurCxxFlags ${BuildOptionsThisCPU})
                 else (BuildForThisCPU)
-                    set (CMAKE_CXX_FLAGS ${BuildOptionsBasic})
+                    set (OurCxxFlags ${BuildOptionsBasic})
                 endif (BuildForThisCPU)
             endif (BuildForNEON)
         endif (BuildForCore2_X86_64)
@@ -326,12 +326,12 @@ endif (BuildFor0ld_X86)
 
 if (BuildForDebug)
     set (CMAKE_BUILD_TYPE "Debug")
-    set (CMAKE_CXX_FLAGS_DEBUG ${BuildOptionsDebug})
-    message (STATUS "DEBUG Build, flags: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}")
+    set (CMAKE_CXX_FLAGS_DEBUG "${BuildOptionsDebug} ${OurCxxFlags}")
+    message (STATUS "DEBUG Build, flags: ${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS}")
 else (BuildForDebug)
     set (CMAKE_BUILD_TYPE "Release")
-    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsRelease})
-    message (STATUS "RELEASE Build, flags: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
+    set (CMAKE_CXX_FLAGS_RELEASE "${BuildOptionsRelease} ${OurCxxFlags}")
+    message (STATUS "RELEASE Build, flags:${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_CXX_FLAGS} ")
 endif (BuildForDebug)
 
 configure_file(
@@ -339,7 +339,7 @@ configure_file(
     "${CMAKE_CURRENT_BINARY_DIR}/yoshimi.desktop"
     IMMEDIATE @ONLY)
 
-# separated as LV2 doesn't need them
+# separated as LV2 doesn't use them
 set (CmdInterface_sources
     Interface/CmdInterface.cpp
     Interface/CmdInterface.h
@@ -609,10 +609,10 @@ set(ExternLibraries
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
     link_directories(/usr/local/lib)
 endif()
-add_library (yoshimi_common STATIC ${ProgSources})
-add_executable (yoshimi ${CmdInterface_sources} main.cpp)
 
-target_link_libraries (yoshimi ${ExternLibraries} yoshimi_common)
+add_executable (yoshimi ${ProgSources} ${CmdInterface_sources} main.cpp)
+
+target_link_libraries (yoshimi ${ExternLibraries})
 
 
 
@@ -744,13 +744,14 @@ if (LV2Plugin)
 
     add_library (yoshimi_lv2 MODULE
         ${LV2_plugin_sources}
+        ${ProgSources}
         ${yoshimi_manifest_ttl}
         ${yoshimi_plugin_ttl}
     )
 
     add_custom_target(yoshimi_lv2_ttl
-    #   COMMAND test -f ${yoshimi_manifest_ttl}
-    #   COMMAND test -f ${yoshimi_plugin_ttl}
+        COMMAND test -f ${CMAKE_CURRENT_SOURCE_DIR}/${yoshimi_manifest_ttl}
+        COMMAND test -f ${CMAKE_CURRENT_SOURCE_DIR}/${yoshimi_plugin_ttl}
     )
 
     SET_TARGET_PROPERTIES(yoshimi_lv2 PROPERTIES
@@ -769,16 +770,16 @@ if (LV2Plugin)
     )
 
     target_link_libraries(yoshimi_lv2
-        yoshimi_common
-        ${LV2_LIBRARIES}
-        ${FLTK_LIBRARIES}
-        ${MXML_LIBRARIES}
-        ${LIBSNDFILE_LIBRARIES}
+        ${ALSA_LIBRARIES}
         ${FFTW3F_LIBRARIES}
-        ${LIBCAIRO_LIBRARIES}
+        ${FLTK_LIBRARIES}
         ${JACK_LIBRARIES}
-        z
+        ${LIBCAIRO_LIBRARIES}
         ${LIBDL_LINUX_LIBS}
+        ${LIBSNDFILE_LIBRARIES}
+        ${LV2_LIBRARIES}
+        ${MXML_LIBRARIES}
+        z
     )
 
     add_dependencies(yoshimi_lv2 yoshimi_lv2_ttl)
