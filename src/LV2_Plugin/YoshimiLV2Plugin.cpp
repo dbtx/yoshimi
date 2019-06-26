@@ -110,6 +110,16 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     {
         return;
     }
+
+    // _bufferSize comes from maxBlockLength in lv2 buf-size extension info.
+    if (sample_count > _bufferSize)
+    {
+        // then the host is buggy or broken.
+        synth->getRuntime().LogError("LV2 host asked for too many samples! Sending none");
+        return;
+    }
+
+    // FIXME sent_all_buffersize_f is one of those things
     //synth->sent_all_buffersize_f = min(sample_count, (uint32_t)synth->buffersize);
     /*
      * The line above seems to cause problems with envelopes
@@ -118,9 +128,6 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
      * to ensure it's removal doesn't cause other problems.
      */
 
-    //int real_sample_count = sample_count;
-    int real_sample_count = min(sample_count, _bufferSize);
-    // not sure which of the above two is the best :(
     int offs = 0;
     int next_frame = 0;
     int processed = 0;
@@ -146,18 +153,18 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         if (event->body.type == _midi_event_id)
         {
             next_frame = event->time.frames;
-            if (next_frame >= real_sample_count)
+            if (next_frame >= sample_count)
                 continue;
             /*if (next_frame == _bufferSize - 1
                && processed == 0)
             {
                 next_frame = 0;
             }*/
-            int to_process = next_frame - offs;
+            uint32_t to_process = next_frame - offs;
 
             if ((to_process > 0)
-               && (processed < real_sample_count)
-               && (to_process <= (real_sample_count - processed)))
+               && (processed < sample_count)
+               && (to_process <= (sample_count - processed)))
             {
                 int mastered = 0;
                 offs = next_frame;
@@ -181,9 +188,9 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         }
     }
 
-    if (processed < real_sample_count)
+    if (processed < sample_count)
     {
-        uint32_t to_process = real_sample_count - processed;
+        uint32_t to_process = sample_count - processed;
         int mastered = 0;
         offs = next_frame;
         while (to_process - mastered > 0)

@@ -23,6 +23,8 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#include <sys/types.h>
+
 /*
  * For test purposes where you want guaranteed identical results, enable the
  * #define below.
