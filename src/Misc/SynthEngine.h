@@ -95,6 +95,8 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         void newHistory(string name, int group);
         void addHistory(string name, int group);
         vector<string> *getHistory(int group);
+        void setHistoryLock(int group, bool status);
+        bool getHistoryLock(int group);
         string lastItemSeen(int group);
         void setLastfileAdded(int group, string name);
         string getLastfileAdded(int group);
@@ -135,6 +137,7 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         bool SingleVector(list<string>& msg_buf, int chan);
         void ListSettings(list<string>& msg_buf);
         int SetSystemValue(int type, int value);
+        int LoadNumbered(unsigned char group, unsigned char entry);
         bool vectorInit(int dHigh, unsigned char chan, int par);
         void vectorSet(int dHigh, unsigned char chan, int par);
         void ClearNRPNs(void);

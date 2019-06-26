@@ -150,6 +150,9 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
         sysefx[nefx] = NULL;
     fadeAll = 0;
 
+    for (int i = 0; i <= TOPLEVEL::XML::MLearn; ++i)
+        Runtime.historyLock[i] = false;
+
     // seed the shared master random number generator
     prng.init(time(NULL));
 
@@ -1541,6 +1544,17 @@ int SynthEngine::SetSystemValue(int type, int value)
 }
 
 
+int SynthEngine::LoadNumbered(unsigned char group, unsigned char entry)
+{
+    string filename;
+    vector<string> &listType = *getHistory(group);
+    if (size_t(entry) >= listType.size())
+        return (miscMsgPush(" FAILED: List entry " + to_string(int(entry)) + " out of range") | 0xFF0000);
+    filename = listType.at(entry);
+    return miscMsgPush(filename);
+}
+
+
 bool SynthEngine::vectorInit(int dHigh, unsigned char chan, int par)
 {
     string name = "";
@@ -1767,8 +1781,17 @@ void SynthEngine::resetAll(bool andML)
         }
     }
     if (andML)
-        midilearn.generalOpps(0, 0, MIDILEARN::control::clearAll, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED);
-    Unmute();
+    {
+        CommandBlock putData;
+        memset(&putData, 0xff, sizeof(putData));
+        putData.data.value.F = 0;
+        putData.data.type = 0;
+        putData.data.control = MIDILEARN::control::clearAll;
+        putData.data.part = TOPLEVEL::section::midiLearn;
+        midilearn.generalOperations(&putData);
+    }
+    while(isMuted())
+        Unmute(); // unwind all mute settings
 }
 
 
@@ -1846,7 +1869,7 @@ void SynthEngine::SetMuteAndWait(void)
 #ifdef GUI_FLTK
     if (interchange.fromGUI ->write(putData.bytes))
     {
-        while(isMuted() == 0)
+        while(isMuted() == 0) // TODO this seems screwy :(
             usleep (1000);
     }
 #endif
@@ -1875,25 +1898,25 @@ void SynthEngine::Mute()
 
 /*
  * Intelligent switch for unknown mute status that always
- * switches off and later returns original unknown state
+ * mutes and later returns original unknown state
  */
 void SynthEngine::mutewrite(int what)
 {
-    unsigned char original = muted;
-    unsigned char tmp = original;
+    //unsigned char original = muted;
+    unsigned char tmp = muted;
     switch (what)
     {
-        case 0: // always off
+        case 0: // always muted
             tmp = 0;
             break;
-        case 1: // always on
+        case 1: // always unmuted
             tmp = 1;
             break;
-        case -1: // further from on
+        case -1: // further from unmute
             tmp -= 1;
             break;
         case 2:
-            if (tmp != 1) // nearer to on
+            if (tmp != 1) // nearer to unmute
                 tmp += 1;
             break;
         default:
@@ -2329,6 +2352,12 @@ void SynthEngine::ShutUp(void)
 
 void SynthEngine::allStop(unsigned int stopType)
 {
+    if(isMuted()) // there's a hanging mute :(
+    {
+        fadeLevel = 0;
+        interchange.flagsWrite(stopType);
+        return;
+    }
     fadeAll = stopType;
     if (fadeLevel < 0.001)
         fadeLevel = 1.0f;
@@ -2463,6 +2492,8 @@ void SynthEngine::newHistory(string name, int group)
 
 void SynthEngine::addHistory(string name, int group)
 {
+    if (Runtime.historyLock[group])
+        return;
     if (findleafname(name) < "!")
         return;
     vector<string> &listType = *getHistory(group);
@@ -2505,6 +2536,18 @@ vector<string> * SynthEngine::getHistory(int group)
             Runtime.Log("Unrecognised group " + to_string(group) + "\nUsing patchset history");
             return &ParamsHistory;
     }
+}
+
+
+void SynthEngine::setHistoryLock(int group, bool status)
+{
+    Runtime.historyLock[group] = status;
+}
+
+
+bool SynthEngine::getHistoryLock(int group)
+{
+    return Runtime.historyLock[group];
 }
 
 
@@ -2576,10 +2619,11 @@ bool SynthEngine::loadHistory()
         return false;
     }
     int hist_size;
+    int count;
     string filetype;
     string type;
     string extension;
-    for (int count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::MLearn; ++count)
+    for (count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::MLearn; ++count)
     {
         switch (count)
         {
@@ -2610,6 +2654,7 @@ bool SynthEngine::loadHistory()
         }
         if (xml->enterbranch(type))
         { // should never exceed max history as size trimmed on save
+            Runtime.historyLock[count] = xml->getparbool("lock_status", false);
             hist_size = xml->getpar("history_size", 0, 0, MAX_HISTORY);
             for (int i = 0; i < hist_size; ++i)
             {
@@ -2649,9 +2694,10 @@ bool SynthEngine::saveHistory()
     }
     xmltree->beginbranch("HISTORY");
     {
+        int count;
         string type;
         string extension;
-        for (int count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::MLearn; ++count)
+        for (count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::MLearn; ++count)
         {
             switch (count)
             {
@@ -2686,6 +2732,7 @@ bool SynthEngine::saveHistory()
                 unsigned int offset = 0;
                 int x = 0;
                 xmltree->beginbranch(type);
+                    xmltree->addparbool("lock_status", Runtime.historyLock[count]);
                     xmltree->addpar("history_size", listType.size());
                     if (listType.size() > MAX_HISTORY)
                         offset = listType.size() - MAX_HISTORY;

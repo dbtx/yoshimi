@@ -197,7 +197,8 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         masterReset,
         patchsetLoad,
         vectorLoad,
-        stateLoad
+        stateLoad,
+        listLoad
     };
 
     // inserts are here as they are split between many
@@ -260,7 +261,8 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         enableCLI,
         enableAutoInstance,
         enableSinglePath,
-        exposeStatus,
+        historyLock,
+        exposeStatus, // CLI only
 
         // start of engine controls
         jackMidiSource = 32,
@@ -482,6 +484,7 @@ namespace MAIN // usage MAIN::control::volume
         saveNamedScale,
         loadNamedState = 92,
         saveNamedState,
+        loadFileFromList,
         exportPadSynthSamples,
 
         masterReset = 96,

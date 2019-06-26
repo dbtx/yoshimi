@@ -32,12 +32,14 @@ using namespace std;
 #include "Misc/MiscFuncs.h"
 #include "Interface/FileMgr.h"
 #include "Interface/InterChange.h"
+#include "Interface/Data2Text.h"
 
 class XMLwrapper;
 
 class SynthEngine;
+class DataText;
 
-class MidiLearn : private MiscFuncs, FileMgr
+class MidiLearn : private FileMgr, DataText
 {
     public:
         MidiLearn(SynthEngine *_synth);
@@ -80,7 +82,7 @@ class MidiLearn : private MiscFuncs, FileMgr
         void listLine(int lineNo);
         void listAll(list<string>& msg_buf);
         bool remove(int itemNumber);
-        void generalOpps(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2);
+        void generalOperations(CommandBlock *getData);
         bool saveList(string name);
         bool insertMidiListData(bool full,  XMLwrapper *xml);
         bool loadList(string name);

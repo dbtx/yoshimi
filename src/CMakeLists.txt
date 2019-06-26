@@ -369,6 +369,7 @@ set (Misc_sources
 set (Interface_Sources
     Interface/CmdInterface.cpp
     Interface/InterChange.cpp
+    Interface/Data2Text.cpp
     Interface/MidiLearn.cpp
     Interface/MidiDecode.cpp
     Interface/FileMgr.cpp

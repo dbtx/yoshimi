@@ -1,5 +1,36 @@
 yoshimi 1.5.11 M
 
+2019-6-25 Will
+* Moved data->text conversions to new file 'Data2Text'.
+
+2019-6-24 Will
+* Swapped menu entry Yoshimi/MIDI Learn ~ button-Reports.
+* Improved MIDI-Learn internal links.
+* Partially separated text replies from respondents.
+* BugFix: voicelist enable calling MIDI_learn.
+
+2019-6-22 Will
+* Clarifed system mute controls.
+  Also added extra sanity checks.
+* Implemented new NRPN for load from history.
+  Not MLearn yet and Instruments only 16 parts.
+* Updated NRPN docs.
+* Improved history NRPNs.
+  Easier to use and greater flexibilty.
+* Updated docs (again!).
+
+2019-6-21 Will
+* Revised message handling in indirectTransfers(
+  More compact and easier to adjust.
+
+2019-6-20 Will
+* Implemented recent file history locking.
+  Currently CLI only.
+* Improved string list searches.
+* Completed locking including GUI controls.
+* Modified indirect controls for direct reads.
+* Updated docs.
+
 2019-6-18 Will
 * Extended 'CommandBlock'
   Changed value to union of float F & int32_t I
