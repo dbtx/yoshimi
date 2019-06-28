@@ -30,6 +30,7 @@
 #include "Misc/SynthHelper.h"
 #include "Synth/LegatoTypes.h"
 #include "Misc/Float2Int.h"
+#include "globals.h"
 
 class ADnoteParameters;
 class Controller;
