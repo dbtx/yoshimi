@@ -1,5 +1,9 @@
 yoshimi 1.5.11 M
 
+2019-06-27 Rob
+* overhauled CMakeLists.txt, removed one in LV2_Plugin.
+* started on Tank object for (I hope) higher performance memory management.
+
 2019-6-26 Will
 * Added in missing new files :(
 

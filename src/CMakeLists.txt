@@ -421,6 +421,8 @@ set (Misc_sources
     Misc/SynthEngine.cpp
     Misc/SynthEngine.h
     Misc/SynthHelper.h
+    Misc/Tank.cpp
+    Misc/Tank.h
     Misc/WaveShapeSamples.h
     Misc/WavFile.cpp
     Misc/WavFile.h
