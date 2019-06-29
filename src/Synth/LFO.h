@@ -33,9 +33,21 @@ class SynthEngine;
 
 class LFO
 {
+            // constructor is bogus. use prep C-STYLE WOOO
+    // they get malloced. they sit around.
+    // i run LFOtank_>grab(nodeID) where nodeID is the address of this LFO spot
+    //  in all of the ADsynth screens. probably need to take part of the addy
+    //    away and dedicate it to the *notes* maybe 8 bits is enough. UGH FIXME
+    // LFOtank finds a good slot and writes my nodeid into it. and sends me
+    // an ID to submit later to get a pointer? a pointer to have to worry about
+    //   updating later? not quite sure
+    // i run ptr->prepLFO() from the FOOnote that would've new'd it before.
+    // (or in C, prepLFO(ptr, ...) )
+    // the nodeid that gets passed
     public:
         LFO(LFOParams *_lfopars, float basefreq, SynthEngine *_synth);
-        ~LFO() { };
+        ~LFO() {}
+        void prepLFO(uint32_t nodeID, LFOParams *_lfopars, float basefreq, SynthEngine *_synth);
         float lfoout(void);
         float amplfoout(void);
     private:

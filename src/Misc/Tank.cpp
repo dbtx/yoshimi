@@ -33,19 +33,19 @@ void Tank::add_tankblock(uint32_t sz)
         case TB_NONE:
             break;
         case TB_MONO_BUF:
-            tb->payload->f32 = new float[synth->buffersize * sz];
+            tb->payload->f32a = (float *) malloc(synth->buffersize * sz);
             break;
         case TB_STEREO_BUF:
-            tb->payload->f32 = new float[2 * synth->buffersize * sz];
+            tb->payload->f32a = (float *) malloc(2 * synth->buffersize * sz);
             break;
         case TB_LFO_OBJ:
-            tb->payload->lfo = new LFO[sz];
+            tb->payload->lfo = (LFO *)malloc(sizeof(LFO) * sz);
             break;
         case TB_ENV_OBJ:
-            tb->payload->env = new Envelope[sz];
+            tb->payload->env = (Envelope *) malloc(sizeof(Envelope) * sz);
             break;
         case TB_FILT_OBJ:
-            tb->payload->filt = new Filter[sz];
+            tb->payload->filt = (Filter *) malloc(sizeof(Filter) * sz);
             break;
         case TB_FX_UNIT:
             break;

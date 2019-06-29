@@ -67,7 +67,7 @@ class Part : private MiscFuncs, SynthHelper, FileMgr
         // Midi commands implemented
         void NoteOn(int note, int velocity, bool renote = false);
         void NoteOff(int note);
-        void AllNotesOff(void) { killallnotes = true; }; // panic, prepare all notes to be turned off
+        void AllNotesOff(void) { killallnotes = true; } // panic, prepare all notes to be turned off
         void SetController(unsigned int type, int par);
         void ReleaseSustainedKeys(void);
         void ReleaseAllKeys(void);
