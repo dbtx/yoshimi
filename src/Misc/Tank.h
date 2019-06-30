@@ -79,7 +79,6 @@ class Part;
 class Resonance;
 class SUBnote;
 class SUBnoteParameters;
-class SUBnoteharmonic;
 class SVFilter;
 
 // tb = tankbit, smallest unit, the thing that we would always
@@ -111,7 +110,6 @@ typedef enum
     TB_PADN_PAR,
     TB_PART_OBJ,
     TB_RESO_OBJ,
-    TB_SUBN_HRM,
     TB_SUBN_OBJ,
     TB_SUBN_PAR,
     TB_SV_FLT,
@@ -146,9 +144,7 @@ typedef union
     Resonance           *reso;
     SUBnote             *subn;
     SUBnoteParameters   *subp;
-    SUBnoteharmonic     *subh;
     SVFilter            *stvf;
-
 } tb_data;
 
 typedef struct
@@ -168,12 +164,13 @@ private:
     SynthEngine *synth;
     tb_type purpose;
     void add_tankblock(uint32_t sz);
-
-    // the root of this monotypical object tree
+    void free_tankblock(tankblock *tb);
+    // the root of this homogeneous object tree
     std::list<tankblock *> tb_group;
 
     // how big we want the 1st, 2nd, etc
     // based on how many we can ever need
+    // have to recalculate this after changes to polyphony or #Parts
     std::vector<uint32_t> block_sz_schedule;
 
 };
