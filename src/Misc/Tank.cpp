@@ -62,7 +62,7 @@ void Tank::add_tankblock(uint32_t sz)
         case TB_ANA_FLT:
             tblk->payload->aflt = (AnalogFilter *) malloc(sizeof(AnalogFilter) * sz);
             break;
-        case TB_CTRL_PAR:
+        case TB_CTRL_OBJ:
             tblk->payload->ctrl = (Controller *) malloc(sizeof(Controller) * sz);
             break;
         case TB_ENV_OBJ:
@@ -163,13 +163,104 @@ void Tank::free_tankblock(tankblock *tblk)
     // good as UUID inside this program. just remember to pass the nodeID of the
     // thing being grab'ed and not the nodeID of the thing calling grab, right?
 
+    // the map will have nodeID for key and block/bit for value.
+    // so grab will return pointer to array position in struct at list item
+    // (block).payload[bit]
+
     // gc can be shallow memcpy from array to array. other tankbits are in other
     // tanks and their addresses stay correct
 
+    // take 17
+    // in each parent object that calls grab for a tankbit, we are later going to
+    // be the primary one who knows we're done and "calls ungrab". so.
+    //
+    // we stop using a separate array in tankblock to store nodeIDs
+    // and instead we put the nodeID as a member in AH CRAP it doesn't work on floats
+    // so we make floats a struct after all.   ^^in the new tankbit, called parent
+    // or smth. that ID is what Tank looks at when finding an unused tb. it knows
+    // the type already, it can access all of them, if a parent is 0 then it is
+    // none. so when parent is ready to ungrab LFO at the pointer self->AmplitudeLFO,
+    // it just sets self->AmplitudeLFO = self->AmplitudeLFO->parent = 0; thus
+    // disowning it, and the memory that gets written to is memory that exists
+    // inside the Tank. parent's nodeID is one of
+    // numberoftankbits(FOOnote) * Polyphony, or
+    // numberofParts * numberofkititems * numberoftankbits(FOOnoteParameters)
+    //
+    // now, gc considerations-- we copy the tankbit wholesale as usual and its
+    // nonzero nodeID for parent comes along for the ride. we check for a gc run
+    // and re-cache
+    // the pointer we get but how do we update pointer to us? we didn't keep a pointer
+    // to the parent. if we did then we'd be able to parent->smthLFO = here_instead.
+    // so maybe call LFO->grab(this) and the Tank automagically takes this.nodeID
+    // whenever? and saves (this) so it can change this.SomeLFO member to new (LFO *)
+    // location later on? no. (not stored in the tank)
+    // the grab'bed one will be written to when returning the
+    // pointer to use, to the parent. grabbed tankbit holds pointer to parent, thus
+    // parent.nodeID, so parent's type is deducible from nodeID's bitmask,
+    // so during a gc we can change movedtankbit.parent->SomeLFO to our new
+    // tankblock[idx]. or tankblock + idx. or whatever.
 
-    // then AFTER visiting all the former type's members' also-grabbed members
+    // what if parent gets moved during same gc? parent pointer becomes wrong.
+    // what do we do for grabbed children? we need to update their parents' pointers
+    // though nodeID won't change of course address will
+
+    // hm. we can still visit those through the pointers that quite naturally still
+    // belong to this tankbit... but we got to make certain that things get
+    // updated in the right sequence. i mean tanks.
+
+    // OH RIGHT i was not planning on doing gc on every tank at once anyway.
+    // because gc takes time and we are going to have time in between periods
+    // so we use an atomic or smth to unlatch the thing, last before returning from
+    // process(). IIRC there are no LFOs that belong to LFOs so there's no
+    // race condition tied up in gc'ing the only LFOtank. but even in some kind of
+    // sequence, i'd not do them all in a pass-- i'd stagger them at least, one Tank
+    // per gc run.
+
+    // tankbits parents are always in other tanks!
+
+    // and everything is broken anyway. by design. heh
+
+    // I would like to sort of preserve locality by causing e.g. LFOParameters
+    // in *that* tank to stay near the LFOparameters of other LFOs that are
+    // going to run templocal in the same *notes* but that's going to be tricky.
+    // if we don't always grab the same notes'worth of LFOs (and we won't) then
+    // ungrabbing will leave wrong-size holes, for Tank to give out to someone later
+    // but they'll not need the results near the same time.
+
+    // it'll be like I did a different flavor of memory fragmentation.
+
+    // so maybe i can defragment only the results buffers? oh but if the LFOparams
+    // tankbits are not fragmented, BUT the LFO tankbits are, then the problem will
+    // probably still appear. likewise during mixing w.r.t. result buffers
+
+    // anyway if we do all these bitty updates immediately after copying
+    // the tankbit to its new slot, then AT LEAST there'll be no broken pointers
+    // in the midst of updating members, because all the data is still in old place.
+    // and it won't get overwritten with new data until some following noteOn()
+    // because we aren't yet shuffling whole sets of live tankbits, we're just
+    // trying to get them out of that tank which is closest to empty.
+    // for now.
+    // in the future try to really defrag each note and not just the free space
+    // and that hopefully without tons of memcpy. tall order and way too far ahead
+
+    // anyway the good-ish news there is that i'm not looping over parts and kititems
+    // anymore, i'm looping over the notes however they sit in any order at all.
+    // AFTER i loop over the LFOs however they sit. I guess I could--
+
+    // whoa. I could look at the scattered FOOnote params and *decide* how the
+    // result buffers will be laid out each period so they always get used in the
+    // same order that those other tankbits will be marched through. and locality++
+
+    // do that, very much that. don't write then defrag, just WRITE IT IN ORDER
+    // each time. estimate, count nodeIDs, sort ascending, reserve float bufs,
+    // march through and scattered-write them whenever their LFOparams gets fired.
+
+    // mooltipass
+
+    // then AFTER visiting all the type's members' also-grabbed members
     // and ungrabbing them as the need arises, we can just...
     free(tblk->payload->f32a);
     return;
-    //our caller is going to knock tblk out from the list it was in
+    // our caller (probably gc()) is going to knock any now-empty tblk out from
+    // the Tank.tb_group list it was in, it's not our problem
 }

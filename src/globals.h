@@ -24,6 +24,7 @@
 #define GLOBALS_H
 
 #include <sys/types.h>
+#include <stdint.h>
 
 /*
  * For test purposes where you want guaranteed identical results, enable the
@@ -979,4 +980,37 @@ union CommandBlock{
  */
 const size_t commandBlockSize = sizeof(CommandBlock);
 
+
+typedef struct {
+        uint32_t nodeID;
+        enum {
+            BOOL,
+            CHAR,
+            DISCRETE,
+            ANALOG,
+            SELECTOR
+        }       nvtype;
+        enum {
+            B_0_1,
+            U_0_N, // duplicate and replace N with 6,7,13,15,23,31, etc
+            U_0_127,     // it can be 0_9 if it represents some enum, e.g. LFOtype
+            U_0_32767,
+            S_M64_P63, // again but signed, from M to P
+            S_M128_P127,
+        }       nvrange;  // make lots more of these YAY
+        union {
+            bool b;
+            unsigned char uc;
+            uint8_t u8;  // these things, heh
+            uint16_t u16;
+            uint32_t u32;
+            int16_t s16;
+            int32_t s32;
+            float f32;
+        //    double d64; // maybe and probably not
+        }       nvalue;
+} node;
+
+#define NID_MASTER_PARTS 0x8000
+#define NID_PARTS
 #endif

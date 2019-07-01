@@ -164,7 +164,7 @@ private:
     SynthEngine *synth;
     tb_type purpose;
     void add_tankblock(uint32_t sz);
-    void free_tankblock(tankblock *tb);
+    void free_tankblock(tankblock *tblk);
     // the root of this homogeneous object tree
     std::list<tankblock *> tb_group;
 
