@@ -94,7 +94,7 @@ typedef enum
     TB_ADN_OBJ,
     TB_ADN_PAR,
     TB_ANA_FLT,
-    TB_CTRL_PAR,
+    TB_CTRL_OBJ,
     TB_ENV_OBJ,
     TB_ENV_PAR,
     TB_EVT_QUE,

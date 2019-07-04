@@ -984,12 +984,12 @@ const size_t commandBlockSize = sizeof(CommandBlock);
 typedef struct {
         uint32_t nodeID;
         enum {
-            BOOL,
-            CHAR,
+            ONESHOT,
+            SPST,
             DISCRETE,
             ANALOG,
             SELECTOR
-        }       nvtype;
+        }       nctype;
         enum {
             B_0_1,
             U_0_N, // duplicate and replace N with 6,7,13,15,23,31, etc
@@ -1001,16 +1001,63 @@ typedef struct {
         union {
             bool b;
             unsigned char uc;
-            uint8_t u8;  // these things, heh
+            signed char sc;
+            uint8_t u8;  // same as .uc?
             uint16_t u16;
             uint32_t u32;
+            uint64_t u64;
             int16_t s16;
             int32_t s32;
+            int64_t s64;
             float f32;
-        //    double d64; // maybe and probably not
+            double d64;
         }       nvalue;
 } node;
 
-#define NID_MASTER_PARTS 0x8000
-#define NID_PARTS
+// node identifier masks
+// higher names are _FIRST_SECOND, 0 = first
+// lower names are prefixed by initial of that side of higher
+// division that we are on, _F_BAR and _S_BAR
+// params / results split comes 1st so we can avoid scattering those splits all over
+// i hope we don't merely find out another thing that's the same way e.g. labels
+// but then, labels can go in a separate search tree using params IDs from here
+// with subitems for every translation? maybe? no the translations don't need to be
+// invovled, the nodeIDs are just a tag that whatever interface uses when getting a
+// string. and maybe that can be done without treefulness, maybe it *should*, have to
+// find out how natural it feels when i try to do it
+// just like this, which may already be revealing its awkwardness
+// i wish it were like MIDI CC byte used as index into array of function pointers to
+// the right handler but yeah that's absurd, and even in original case may be so
+
+// everything beginning with NIM_P_ can be used to reconstruct a state (& undo/redo!!)
+// everything beginning with NIM_R_ will probably be overwritten in a msec or so, AND
+//                                  will be great at tapping signals for test manifold
+
+#define NIM_PARAMS_RESULTS      0x80000000  //  [31]
+#define NIM_P_MASTER_PARTS      0x40000000  //  [30]
+#define NIM_P_M_
+#define NIM_P_P_SELECT          0x7E000000  // [29:24]
+#define NIM_P_              0x01000000  //
+#define NIM_PART_PARS_SEL       0x00C00000  //
+#define NIM_PART_PARS_
+
+// but don't actually define all these things as the one true layout.
+// define a versioning and inter-version compat system:
+// program's multiple versions are all defined and highest one is defined also
+// to be unversioned one using name system above
+// e.g. #define NIM_P_MASTER_PARTS NIM_P_MASTER_PARTS_1_6_3
+// indicating 1.6.3 had actual incompatible changes made to the nodemap. or instead
+// of _x_x_x just use the build # and don't worry about it
+// incompat changes = more bits and where, new masks and shift counts NIM_ and NIS_
+// perhaps it will be most straightforward to copy entire nodemap's navigation code
+//  into a new source so that when you have to break it, the old one gets used on old
+//  files and new one gets used by default. consider making it possible to export for
+//  compatibility with older version and warn about nonexistent features at that time
+// each nodewise configuration indicates the version it's made from (also in the text)
+// all known versions are defined in code, export everything into e.g. TOML in a way
+//  that recreating the tree from locations is entirely natural in any version. and
+//  spew warnings about nonexistent nodes at that time.
+//  { Parts.Part01: on; Parts.Part02: on; ... Parts.Part84: on; }
+//             84 produces message because Yoshimi 2.3.0 may have it but we don't
+
 #endif

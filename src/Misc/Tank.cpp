@@ -206,11 +206,11 @@ void Tank::free_tankblock(tankblock *tblk)
 
     // hm. we can still visit those through the pointers that quite naturally still
     // belong to this tankbit... but we got to make certain that things get
-    // updated in the right sequence. i mean tanks.
+    // updated in the right sequence. i mean that tanks get updated.
 
     // OH RIGHT i was not planning on doing gc on every tank at once anyway.
     // because gc takes time and we are going to have time in between periods
-    // so we use an atomic or smth to unlatch the thing, last before returning from
+    // so we use an atomic or smth to unlatch gc caller last, before returning from
     // process(). IIRC there are no LFOs that belong to LFOs so there's no
     // race condition tied up in gc'ing the only LFOtank. but even in some kind of
     // sequence, i'd not do them all in a pass-- i'd stagger them at least, one Tank
@@ -221,8 +221,8 @@ void Tank::free_tankblock(tankblock *tblk)
     // and everything is broken anyway. by design. heh
 
     // I would like to sort of preserve locality by causing e.g. LFOParameters
-    // in *that* tank to stay near the LFOparameters of other LFOs that are
-    // going to run templocal in the same *notes* but that's going to be tricky.
+    // in *that* tank to stay near the LFOparameters of other LFOs that'll be
+    // temporally local in the same *notes* but that's going to be tricky.
     // if we don't always grab the same notes'worth of LFOs (and we won't) then
     // ungrabbing will leave wrong-size holes, for Tank to give out to someone later
     // but they'll not need the results near the same time.
@@ -231,7 +231,9 @@ void Tank::free_tankblock(tankblock *tblk)
 
     // so maybe i can defragment only the results buffers? oh but if the LFOparams
     // tankbits are not fragmented, BUT the LFO tankbits are, then the problem will
-    // probably still appear. likewise during mixing w.r.t. result buffers
+    // probably still appear. likewise during mixing w.r.t. result buffers. I wish
+    // sometimes that memory was just one big giant shift register, indeed it
+    // could be but not so very big in the end, or very expensive.
 
     // anyway if we do all these bitty updates immediately after copying
     // the tankbit to its new slot, then AT LEAST there'll be no broken pointers

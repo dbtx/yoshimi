@@ -408,6 +408,8 @@ set (Misc_sources
     Misc/ConfBuild.h
     Misc/Config.cpp
     Misc/Config.h
+    Misc/EventQueue.cpp
+    Misc/EventQueue.h
     Misc/Float2Int.h
     Misc/Microtonal.cpp
     Misc/Microtonal.h
